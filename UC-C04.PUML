@@ -8,17 +8,17 @@ control KeranjangController
 database produk as "produk\n(Database Stok)"
 database detail_pesanan as "detail_pesanan\n(Keranjang)"
 
-box "Sistem Inventaris & Transaksi"
-    participant HalamanKeranjang
-    participant KeranjangController
-end box
+' box "Sistem Inventaris & Transaksi"
+'     participant HalamanKeranjang
+'     participant KeranjangController
+' end box
 
 activate Pembeli
-Pengguna -> HalamanKeranjang : Mengakses halaman Keranjang Belanja (Langkah 1)
+Pembeli -> HalamanKeranjang : Mengakses halaman Keranjang Belanja (Langkah 1)
 activate HalamanKeranjang
-HalamanKeranjang -> Pengguna : Tampilkan daftar produk dan kuantitas (Langkah 1)
+HalamanKeranjang -> Pembeli : Tampilkan daftar produk dan kuantitas (Langkah 1)
 
-Pengguna -> HalamanKeranjang : Menekan "+" / "-" atau mengedit kuantitas (Langkah 2)
+Pembeli -> HalamanKeranjang : Menekan "+" / "-" atau mengedit kuantitas (Langkah 2)
 
 HalamanKeranjang -> KeranjangController : perbaruiKuantitas(ID_Item, Kuantitas_Baru)
 activate KeranjangController
@@ -27,33 +27,35 @@ KeranjangController -> produk : Verifikasi ketersediaan stok untuk Kuantitas_Bar
 activate produk
 return Status Stok
 
-alt Stok Tidak Mencukupi (Alternative Flow 3.a)
-    note over KeranjangController
-        Kuantitas baru > Stok tersedia
-    end note
-    KeranjangController -> HalamanKeranjang : Tampilkan notifikasi("Gagal: Stok Produk Tidak Mencukupi.") (Langkah 4.a)
-    deactivate KeranjangController
+KeranjangController -> detail_pesanan : Perbarui nilai kuantitas (Langkah 4)
+activate detail_pesanan
 
-    HalamanKeranjang -> Pengguna : Menerima notifikasi gagal (Langkah 5.a)
+KeranjangController -> detail_pesanan : Hitung ulang subtotal
+
+detail_pesanan --> KeranjangController : Status Update
+deactivate detail_pesanan
+
+KeranjangController -> HalamanKeranjang : Muat ulang daftar keranjang (Langkah 5)
+deactivate KeranjangController
+
+HalamanKeranjang -> Pembeli : Melihat kuantitas dan subtotal yang diperbarui (Langkah 6)
     
-    note over Pengguna, HalamanKeranjang
-        Memperbaiki kuantitas (Langkah 5.a)
-        Kembali ke Langkah 2 (Langkah 5.b)
-    end note
-else Stok Mencukupi (Main Flow)
-    KeranjangController -> detail_pesanan : Perbarui nilai kuantitas (Langkah 4)
-    activate detail_pesanan
+' alt Stok Tidak Mencukupi (Alternative Flow 3.a)
+'     note over KeranjangController
+'         Kuantitas baru > Stok tersedia
+'     end note
+'     KeranjangController -> HalamanKeranjang : Tampilkan notifikasi("Gagal: Stok Produk Tidak Mencukupi.") (Langkah 4.a)
+'     deactivate KeranjangController
+
+'     HalamanKeranjang -> Pembeli : Menerima notifikasi gagal (Langkah 5.a)
     
-    KeranjangController -> KeranjangController : Hitung ulang subtotal
-    
-    detail_pesanan --> KeranjangController : Status Update
-    deactivate detail_pesanan
-    
-    KeranjangController -> HalamanKeranjang : Muat ulang daftar keranjang (Langkah 5)
-    deactivate KeranjangController
-    
-    HalamanKeranjang -> Pembeli : Melihat kuantitas dan subtotal yang diperbarui (Langkah 6)
-end alt
+'     note over Pembeli, HalamanKeranjang
+'         Memperbaiki kuantitas (Langkah 5.a)
+'         Kembali ke Langkah 2 (Langkah 5.b)
+'     end note
+' else Stok Mencukupi (Main Flow)
+
+' end alt
 
 deactivate HalamanKeranjang
 deactivate produk

@@ -7,10 +7,10 @@ boundary HalamanKelolaProduk
 control ProdukController
 database produk as "produk\n(Database)"
 
-box "Sistem Manajemen Produk"
-    participant HalamanKelolaProduk
-    participant ProdukController
-end box
+' box "Sistem Manajemen Produk"
+'     participant HalamanKelolaProduk
+'     participant ProdukController
+' end box
 
 activate Admin
 Admin -> HalamanKelolaProduk : Mengakses halaman kelola produk (Langkah 1)
@@ -19,34 +19,36 @@ activate HalamanKelolaProduk
 HalamanKelolaProduk -> Admin : Tampilkan daftar seluruh katalog produk (Langkah 1 & 2)
 
 Admin -> HalamanKelolaProduk : Menekan tombol "Hapus" pada produk (Langkah 3)
-HalamanKelolaProduk -> HalamanKelolaProduk : Tampilkan kotak dialog konfirmasi (Langkah 3)
+' HalamanKelolaProduk -> ProdukController : Tampilkan kotak dialog konfirmasi (Langkah 3)
 
-Admin -> HalamanKelolaProduk : Memilih "Ya, Hapus" / "Batal" (Langkah 4 / 4.a)
+' Admin -> HalamanKelolaProduk : Memilih "Ya, Hapus" / "Batal" (Langkah 4 / 4.a)
 
-alt Jika Admin Memilih "Ya, Hapus" (Main Flow)
-    HalamanKelolaProduk -> ProdukController : hapusProduk(ID_Produk)
-    activate ProdukController
+HalamanKelolaProduk -> ProdukController : hapusProduk(ID_Produk)
+activate ProdukController
+
+ProdukController -> produk : Memproses perintah hapus permanen (Langkah 5)
+activate produk
+return Status Operasi
+deactivate produk
+
+ProdukController -> HalamanKelolaProduk : Tampilkan notifikasi("Produk berhasil dihapus") (Langkah 6)
+
+ProdukController -> HalamanKelolaProduk : Perbarui daftar kelola produk (Langkah 7)
+deactivate ProdukController
+
+HalamanKelolaProduk -> Admin : Menerima notifikasi sukses dan daftar terbaru
+
+' alt Jika Admin Memilih "Ya, Hapus" (Main Flow)
+
+' else Jika Admin Memilih "Batal" (Alternative Flow 4.a)
+'     HalamanKelolaProduk -> ProdukController : batalkanPenghapusan(ID_Produk)
+'     activate ProdukController
     
-    ProdukController -> produk : Memproses perintah hapus permanen (Langkah 5)
-    activate produk
-    return Status Operasi
-    deactivate produk
+'     ProdukController -> HalamanKelolaProduk : Berikan notifikasi("Penghapusan dibatalkan.") (Langkah 5.a)
+'     deactivate ProdukController
     
-    ProdukController -> HalamanKelolaProduk : Tampilkan notifikasi("Produk berhasil dihapus") (Langkah 6)
-    
-    ProdukController -> HalamanKelolaProduk : Perbarui daftar kelola produk (Langkah 7)
-    deactivate ProdukController
-    
-    HalamanKelolaProduk -> Admin : Menerima notifikasi sukses dan daftar terbaru
-else Jika Admin Memilih "Batal" (Alternative Flow 4.a)
-    HalamanKelolaProduk -> ProdukController : batalkanPenghapusan(ID_Produk)
-    activate ProdukController
-    
-    ProdukController -> HalamanKelolaProduk : Berikan notifikasi("Penghapusan dibatalkan.") (Langkah 5.a)
-    deactivate ProdukController
-    
-    HalamanKelolaProduk -> Admin : Menerima notifikasi pembatalan (Langkah 5.a)
-end alt
+'     HalamanKelolaProduk -> Admin : Menerima notifikasi pembatalan (Langkah 5.a)
+' end alt
 
 deactivate HalamanKelolaProduk
 

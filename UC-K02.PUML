@@ -8,11 +8,11 @@ boundary HalamanFormBerita
 control BeritaController
 database berita as "berita\n(Database)"
 
-box "Sistem Manajemen Berita"
-    participant HalamanDaftarBerita
-    participant HalamanFormBerita
-    participant BeritaController
-end box
+' box "Sistem Manajemen Berita"
+'     participant HalamanDaftarBerita
+'     participant HalamanFormBerita
+'     participant BeritaController
+' end box
 
 activate Admin
 Admin -> HalamanDaftarBerita : Mengakses halaman daftar berita (Langkah 1)
@@ -31,31 +31,33 @@ Admin -> HalamanFormBerita : Menekan tombol "Terbitkan" (Langkah 4)
 HalamanFormBerita -> BeritaController : tambahBerita(Data Berita Baru)
 activate BeritaController
 
-BeritaController -> BeritaController : Validasi kelengkapan dan format data (Langkah 5)
+BeritaController -> berita : Validasi kelengkapan dan format data (Langkah 5)
 
-alt Gagal Validasi (Alternative Flow 5.a)
-    BeritaController -> HalamanFormBerita : Tampilkan notifikasi("Publikasi Gagal: Mohon lengkapi...") (Langkah 6.a)
-    deactivate BeritaController
+BeritaController -> berita : Menyimpan berita baru (Status='Terbit') (Langkah 6.b)
+activate berita
+return ID_Berita_Baru
+deactivate berita
     
-    HalamanFormBerita -> Admin : Menerima notifikasi gagal
-    
-    note over Admin, HalamanFormBerita
-        Memperbaiki data (Langkah 7.a)
-        Kembali ke Langkah 4 (Langkah 7.b)
-    end note
-else Validasi Sukses (Main Flow)
-    BeritaController -> berita : Menyimpan berita baru (Status='Terbit') (Langkah 6.b)
-    activate berita
-    return ID_Berita_Baru
-    deactivate berita
-    
-    BeritaController -> HalamanFormBerita : Tampilkan notifikasi("Berita berhasil diterbitkan") (Langkah 7)
+BeritaController -> HalamanFormBerita : Tampilkan notifikasi("Berita berhasil diterbitkan") (Langkah 7)
 
-    BeritaController -> HalamanDaftarBerita : Perbarui daftar berita Pembeli
-    deactivate BeritaController
+' BeritaController -> HalamanDaftarBerita : Perbarui daftar berita Pembeli
+deactivate BeritaController
     
-    HalamanFormBerita -> Admin : Menerima notifikasi sukses
-    deactivate HalamanFormBerita
-end alt
+HalamanFormBerita -> Admin : Menerima notifikasi sukses
+deactivate HalamanFormBerita
+
+' alt Gagal Validasi (Alternative Flow 5.a)
+'     BeritaController -> HalamanFormBerita : Tampilkan notifikasi("Publikasi Gagal: Mohon lengkapi...") (Langkah 6.a)
+'     deactivate BeritaController
+    
+'     HalamanFormBerita -> Admin : Menerima notifikasi gagal
+    
+'     note over Admin, HalamanFormBerita
+'         Memperbaiki data (Langkah 7.a)
+'         Kembali ke Langkah 4 (Langkah 7.b)
+'     end note
+' else Validasi Sukses (Main Flow)
+
+' end alt
 
 @enduml

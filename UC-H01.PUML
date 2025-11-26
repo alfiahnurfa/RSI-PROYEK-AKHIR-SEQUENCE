@@ -5,12 +5,13 @@ skinparam style strictuml
 actor Admin
 boundary HalamanKelolaProduk
 control ProdukController
+control PesananController
 database produk as "produk\n(Database)"
 
-box "Sistem Manajemen Produk"
-    participant HalamanKelolaProduk
-    participant ProdukController
-end box
+' box "Sistem Manajemen Produk"
+'     participant HalamanKelolaProduk
+'     participant ProdukController
+' end box
 
 activate Admin
 Admin -> HalamanKelolaProduk : Mengakses halaman "Kelola Produk" (Langkah 1)
@@ -24,20 +25,22 @@ activate produk
 return List Produk Lengkap / List Kosong (Langkah 2.a)
 deactivate produk
 
-alt Jika Produk Ditemukan (Main Flow)
-    PesananController -> HalamanKelolaProduk : Tampilkan daftar ringkasan produk (Langkah 3)
-    deactivate ProdukController
+PesananController -> HalamanKelolaProduk : Tampilkan daftar ringkasan produk (Langkah 3)
+deactivate ProdukController
+
+HalamanKelolaProduk -> Admin : Melihat daftar produk dan opsi aksi (Langkah 4)
+
+' alt Jika Produk Ditemukan (Main Flow)
+
+' else Jika Daftar Kosong (Alternative Flow 2.a)
+'     note over ProdukController
+'         List Produk Kosong
+'     end note
+'     ProdukController -> HalamanKelolaProduk : Tampilkan notifikasi("Belum ada produk yang ditambahkan.") (Langkah 3.a)
+'     deactivate ProdukController
     
-    HalamanKelolaProduk -> Admin : Melihat daftar produk dan opsi aksi (Langkah 4)
-else Jika Daftar Kosong (Alternative Flow 2.a)
-    note over ProdukController
-        List Produk Kosong
-    end note
-    ProdukController -> HalamanKelolaProduk : Tampilkan notifikasi("Belum ada produk yang ditambahkan.") (Langkah 3.a)
-    deactivate ProdukController
-    
-    HalamanKelolaProduk -> Admin : Menerima notifikasi daftar kosong (Langkah 4)
-end alt
+'     HalamanKelolaProduk -> Admin : Menerima notifikasi daftar kosong (Langkah 4)
+' end alt
 deactivate HalamanKelolaProduk
 
 @enduml

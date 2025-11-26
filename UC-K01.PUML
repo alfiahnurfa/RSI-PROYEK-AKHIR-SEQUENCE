@@ -7,10 +7,10 @@ boundary HalamanDaftarBerita
 control BeritaController
 database berita as "berita\n(Database)"
 
-box "Sistem Manajemen Berita"
-    participant HalamanDaftarBerita
-    participant BeritaController
-end box
+' box "Sistem Manajemen Berita"
+'     participant HalamanDaftarBerita
+'     participant BeritaController
+' end box
 
 activate Admin
 Admin -> HalamanDaftarBerita : Mengakses menu "Berita" (Langkah 1)
@@ -24,20 +24,22 @@ activate berita
 return List Berita Lengkap / List Kosong (Langkah 2.a)
 deactivate berita
 
-alt Jika Berita Ditemukan (Main Flow)
-    BeritaController -> HalamanDaftarBerita : Tampilkan daftar berita lengkap (Langkah 3)
-    deactivate BeritaController
+BeritaController -> HalamanDaftarBerita : Tampilkan daftar berita lengkap (Langkah 3)
+deactivate BeritaController
     
-    HalamanDaftarBerita -> Admin : Melihat dan meninjau daftar berita (Langkah 4)
-else Jika Daftar Kosong (Alternative Flow 2.a)
-    note over BeritaController
-        List Berita Kosong
-    end note
-    BeritaController -> HalamanDaftarBerita : Tampilkan notifikasi("Belum ada berita yang ditambahkan.") (Langkah 3.a)
-    deactivate BeritaController
+HalamanDaftarBerita -> Admin : Melihat dan meninjau daftar berita (Langkah 4)
+
+' alt Jika Berita Ditemukan (Main Flow)
+
+' else Jika Daftar Kosong (Alternative Flow 2.a)
+'     note over BeritaController
+'         List Berita Kosong
+'     end note
+'     BeritaController -> HalamanDaftarBerita : Tampilkan notifikasi("Belum ada berita yang ditambahkan.") (Langkah 3.a)
+'     deactivate BeritaController
     
-    HalamanDaftarBerita -> Admin : Menerima notifikasi daftar kosong (Langkah 4)
-end alt
+'     HalamanDaftarBerita -> Admin : Menerima notifikasi daftar kosong (Langkah 4)
+' end alt
 deactivate HalamanDaftarBerita
 
 @enduml

@@ -7,10 +7,10 @@ boundary HalamanKatalog
 control ProdukController
 database produk as "produk\n(Database)"
 
-box "Sistem Filter Katalog"
-    participant HalamanKatalog
-    participant ProdukController
-end box
+' box "Sistem Filter Katalog"
+'     participant HalamanKatalog
+'     participant ProdukController
+' end box
 
 activate Pembeli
 Pembeli -> HalamanKatalog : Mengakses halaman katalog (Langkah 1 & 1.a)
@@ -26,11 +26,12 @@ alt Filter Berdasarkan Kategori (Main Flow)
     return List Produk Filtered / List Kosong (Langkah 3.b)
     deactivate produk
     
-    alt Hasil Ditemukan
-        ProdukController -> HalamanKatalog : Tampilkan produk hasil filter (Langkah 4)
-    else Hasil Tidak Ditemukan (Alternative Flow)
-        ProdukController -> HalamanKatalog : Tampilkan notifikasi("Tidak ada produk yang sesuai...")
-    end
+    ProdukController -> HalamanKatalog : Tampilkan produk hasil filter (Langkah 4)
+
+    ' alt Hasil Ditemukan
+    ' else Hasil Tidak Ditemukan (Alternative Flow)
+    '     ProdukController -> HalamanKatalog : Tampilkan notifikasi("Tidak ada produk yang sesuai...")
+    ' end
     deactivate ProdukController
     
     HalamanKatalog -> Pembeli : Melihat produk yang tersaring (Langkah 5)
@@ -46,12 +47,12 @@ else Filter Berdasarkan Harga (Alternative Flow 2.a)
     activate produk
     return List Produk Filtered / List Kosong (Langkah 3.b)
     deactivate produk
+    ProdukController -> HalamanKatalog : Tampilkan produk hasil filter (Langkah 5.a)
 
-    alt Hasil Ditemukan
-        ProdukController -> HalamanKatalog : Tampilkan produk hasil filter (Langkah 5.a)
-    else Hasil Tidak Ditemukan (Alternative Flow)
-        ProdukController -> HalamanKatalog : Tampilkan notifikasi("Tidak ada produk yang sesuai...")
-    end
+    ' alt Hasil Ditemukan
+    ' else Hasil Tidak Ditemukan (Alternative Flow)
+    '     ProdukController -> HalamanKatalog : Tampilkan notifikasi("Tidak ada produk yang sesuai...")
+    ' end
     deactivate ProdukController
 
     HalamanKatalog -> Pembeli : Melihat produk yang tersaring (Langkah 6)

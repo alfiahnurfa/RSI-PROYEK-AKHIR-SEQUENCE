@@ -7,10 +7,10 @@ boundary HalamanLogin
 control UserController
 database user as "user\n(Database)"
 
-box "Sistem Otentikasi"
-    participant HalamanLogin
-    participant UserController
-end box
+' box "Sistem Otentikasi"
+'     participant HalamanLogin
+'     participant UserController
+' end box
 
 activate Pengguna
 Pengguna -> HalamanLogin : Mengakses halaman Login (Langkah 1)
@@ -31,6 +31,14 @@ return DataPenggunaTersimpan
 
 UserController -> UserController : Verifikasi Password (Data input vs Hash tersimpan) (Langkah 4)
 
+    UserController -> UserController : Buat sesi login baru (Langkah 5)
+    
+    UserController -> HalamanLogin : Tampilkan notifikasi("Login Berhasil") (Langkah 6)
+    deactivate UserController
+    
+    HalamanLogin -> Pengguna : Arahkan ke Halaman Utama (Langkah 6, 7)
+    deactivate HalamanLogin
+
 ' alt Jika Verifikasi Gagal (Alternative Flow 4.a)
 '     UserController -> HalamanLogin : Tampilkan notifikasi("Login Gagal, Email/Password Salah.") (Langkah 4.b)
 '     deactivate UserController
@@ -42,13 +50,7 @@ UserController -> UserController : Verifikasi Password (Data input vs Hash tersi
 '         Kembali ke Langkah 2 (Langkah 4.d)
 '     end note
 ' else Jika Verifikasi Berhasil (Main Flow)
-'     UserController -> UserController : Buat sesi login baru (Langkah 5)
-    
-'     UserController -> HalamanLogin : Tampilkan notifikasi("Login Berhasil") (Langkah 6)
-'     deactivate UserController
-    
-'     HalamanLogin -> Pengguna : Arahkan ke Halaman Utama (Langkah 6, 7)
-'     deactivate HalamanLogin
+
 ' end alt
 
 deactivate user

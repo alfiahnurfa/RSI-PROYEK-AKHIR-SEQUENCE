@@ -11,22 +11,23 @@ database pesanan as "pesanan\n(Status)"
 database pembayaran as "pembayaran\n(Transaksi)"
 participant SistemEksternal as "Aplikasi Pembayaran"
 
-box "Sistem Transaksi & Pembayaran"
-    participant HalamanCheckout
-    participant HalamanPembayaran
-    participant PesananController
-    participant PembayaranController
-end box
+' box "Sistem Transaksi & Pembayaran"
+'     participant HalamanCheckout
+'     participant HalamanPembayaran
+'     participant PesananController
+'     participant PembayaranController
+' end box
 
 activate Pembeli
 
-alt Inisiasi Pesanan (Langkah 1)
-    Pembeli -> HalamanCheckout : Klik "Beli" (dari keranjang) / "Beli Langsung" (dari katalog)
-else
-    note over Pembeli
-        Asumsi proses inisiasi (membuat entri pesanan) terjadi di sini
-    end note
-end
+Pembeli -> HalamanCheckout : Klik "Beli" (dari keranjang) / "Beli Langsung" (dari katalog)
+' alt Inisiasi Pesanan (Langkah 1)
+    
+' else
+'     note over Pembeli
+'         Asumsi proses inisiasi (membuat entri pesanan) terjadi di sini
+'     end note
+' end
 activate HalamanCheckout
 
 HalamanCheckout -> PesananController : buatPesanan()
@@ -55,17 +56,17 @@ deactivate PembayaranController
 activate HalamanPembayaran
 
 group Alur Pembayaran
-    alt Pembayaran Dibatalkan Otomatis (Alternative Flow 3.a, 5.a, 6.a, 7.a)
-        Sistem -> pembayaran : Catat Waktu Kedaluwarsa (Langkah 3.a)
-        Sistem -> pembayaran : Cek Batas Waktu Habis (Langkah 5.a)
+    ' alt Pembayaran Dibatalkan Otomatis (Alternative Flow 3.a, 5.a, 6.a, 7.a)
+    '     Sistem -> pembayaran : Catat Waktu Kedaluwarsa (Langkah 3.a)
+    '     Sistem -> pembayaran : Cek Batas Waktu Habis (Langkah 5.a)
         
-        note over Sistem, Pembeli
-            Jika batas waktu terlewati
-        end note
+    '     note over Sistem, Pembeli
+    '         Jika batas waktu terlewati
+    '     end note
 
-        pembayaran -> pesanan : Update Status='Dibatalkan Otomatis' (Langkah 6.a)
-        HalamanPembayaran -> Pembeli : Tampilkan notifikasi pembatalan (Langkah 7.a)
-    else Pembayaran Sukses (Main Flow 4-9)
+    '     pembayaran -> pesanan : Update Status='Dibatalkan Otomatis' (Langkah 6.a)
+    '     HalamanPembayaran -> Pembeli : Tampilkan notifikasi pembatalan (Langkah 7.a)
+    ' else Pembayaran Sukses (Main Flow 4-9)
         Pembeli -> SistemEksternal : Memindai QR & Melakukan pembayaran (Langkah 4, 5)
         
         Pembeli -> HalamanPembayaran : Klik "Konfirmasi Pembayaran" (Langkah 6)
@@ -81,7 +82,7 @@ group Alur Pembayaran
         deactivate PembayaranController
 
         HalamanPembayaran -> Pembeli : Menerima notifikasi sukses (Langkah 9)
-    end alt
+    ' end alt
 end
 
 deactivate HalamanPembayaran

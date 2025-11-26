@@ -7,10 +7,10 @@ boundary HalamanKatalog
 control ProdukController
 database produk as "produk\n(Database)"
 
-box "Sistem Katalog"
-    participant HalamanKatalog
-    participant ProdukController
-end box
+' box "Sistem Katalog"
+'     participant HalamanKatalog
+'     participant ProdukController
+' end box
 
 activate Pembeli
 Pembeli -> HalamanKatalog : Akses dashboard / Klik "Lihat Selengkapnya" (Langkah 1)

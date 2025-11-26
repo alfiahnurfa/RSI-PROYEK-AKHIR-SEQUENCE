@@ -8,17 +8,17 @@ boundary HalamanDetailPesanan
 control PesananController
 database pesanan as "pesanan\n(Database)"
 
-box "Sistem Riwayat Pesanan"
-    participant HalamanTransaksi
-    participant HalamanDetailPesanan
-    participant PesananController
-end box
+' box "Sistem Riwayat Pesanan"
+'     participant HalamanTransaksi
+'     participant HalamanDetailPesanan
+'     participant PesananController
+' end box
 
 activate Pembeli
-Pengguna -> HalamanTransaksi : Mengakses riwayat pesanan (Langkah 1 & 2)
+Pembeli -> HalamanTransaksi : Mengakses riwayat pesanan (Langkah 1 & 2)
 activate HalamanTransaksi
 
-Pengguna -> HalamanTransaksi : Mengklik ringkasan pesanan / "Lihat Detail" (Langkah 3)
+Pembeli -> HalamanTransaksi : Mengklik ringkasan pesanan / "Lihat Detail" (Langkah 3)
 HalamanTransaksi -> PesananController : ambilDetailPesanan(ID_Pesanan)
 deactivate HalamanTransaksi
 activate PesananController
@@ -28,20 +28,22 @@ activate pesanan
 return Data Pesanan Lengkap / Null (Langkah 4.a)
 deactivate pesanan
 
-alt Jika Pesanan Ditemukan (Main Flow)
-    PesananController -> HalamanDetailPesanan : Tampilkan halaman Detail Pesanan(Data Lengkap) (Langkah 5)
-    deactivate PesananController
-    activate HalamanDetailPesanan
+PesananController -> HalamanDetailPesanan : Tampilkan halaman Detail Pesanan(Data Lengkap) (Langkah 5)
+deactivate PesananController
+activate HalamanDetailPesanan
 
-    HalamanDetailPesanan -> Pembeli : Meninjau detail pesanan (Langkah 6)
-    deactivate HalamanDetailPesanan
-else Jika Pesanan Tidak Ditemukan (Alternative Flow 4.a)
-    PesananController -> HalamanTransaksi : Tampilkan notifikasi("Detail Pesanan Tidak Ditemukan") (Langkah 5.a)
-    deactivate PesananController
+HalamanDetailPesanan -> Pembeli : Meninjau detail pesanan (Langkah 6)
+deactivate HalamanDetailPesanan
+
+' alt Jika Pesanan Ditemukan (Main Flow)
+
+' else Jika Pesanan Tidak Ditemukan (Alternative Flow 4.a)
+'     PesananController -> HalamanTransaksi : Tampilkan notifikasi("Detail Pesanan Tidak Ditemukan") (Langkah 5.a)
+'     deactivate PesananController
     
-    activate HalamanTransaksi
-    HalamanTransaksi -> Pembeli : Menerima notifikasi gagal & diarahkan kembali
-    deactivate HalamanTransaksi
-end alt
+'     activate HalamanTransaksi
+'     HalamanTransaksi -> Pembeli : Menerima notifikasi gagal & diarahkan kembali
+'     deactivate HalamanTransaksi
+' end alt
 
 @enduml

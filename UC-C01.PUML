@@ -8,18 +8,18 @@ control KeranjangController
 database produk as "produk\n(Database)"
 database detail_pesanan as "detail_pesanan\n(Keranjang)"
 
-box "Sistem Transaksi"
-    participant HalamanDetailProduk
-    participant KeranjangController
-end box
+' box "Sistem Transaksi"
+'     participant HalamanDetailProduk
+'     participant KeranjangController
+' end box
 
 activate Pembeli
-Pengguna -> HalamanDetailProduk : Membuka detail katalog produk (Langkah 1)
+Pembeli -> HalamanDetailProduk : Membuka detail katalog produk (Langkah 1)
 activate HalamanDetailProduk
 
-Pengguna -> HalamanDetailProduk : Memasukkan jumlah produk (Langkah 2)
+Pembeli -> HalamanDetailProduk : Memasukkan jumlah produk (Langkah 2)
 
-Pengguna -> HalamanDetailProduk : Menekan tombol "Simpan keranjang" (Langkah 3)
+Pembeli -> HalamanDetailProduk : Menekan tombol "Simpan keranjang" (Langkah 3)
 
 HalamanDetailProduk -> KeranjangController : tambahItemKeranjang(ID_Produk, Kuantitas)
 activate KeranjangController
@@ -28,30 +28,32 @@ KeranjangController -> produk : Verifikasi ketersediaan stok & status (Langkah 4
 activate produk
 return Status Stok & Harga Saat Ini
 
-alt Stok Tidak Mencukupi (Alternative Flow 4.a)
-    note over KeranjangController
-        Kuantitas diminta > Stok Tersedia
-    end note
-    KeranjangController -> HalamanDetailProduk : Tampilkan notifikasi("Gagal: Stok Produk Tidak Mencukupi") (Langkah 4.b)
-    deactivate KeranjangController
+KeranjangController -> detail_pesanan : Perbarui/Simpan item baru (ID_Produk, Kuantitas, Harga) (Langkah 5)
+activate detail_pesanan
+return Status Simpan
+deactivate detail_pesanan
+
+KeranjangController -> HalamanDetailProduk : Tampilkan notifikasi("Produk berhasil ditambahkan...") (Langkah 6)
+deactivate KeranjangController
+
+HalamanDetailProduk -> Pembeli : Menerima notifikasi sukses
+
+' alt Stok Tidak Mencukupi (Alternative Flow 4.a)
+'     note over KeranjangController
+'         Kuantitas diminta > Stok Tersedia
+'     end note
+'     KeranjangController -> HalamanDetailProduk : Tampilkan notifikasi("Gagal: Stok Produk Tidak Mencukupi") (Langkah 4.b)
+'     deactivate KeranjangController
     
-    HalamanDetailProduk -> Pengguna : Menerima notifikasi gagal
+'     HalamanDetailProduk -> Pembeli : Menerima notifikasi gagal
     
-    note over Pengguna, HalamanDetailProduk
-        Mengubah jumlah produk (Langkah 4.c)
-        Kembali ke Langkah 2 (Langkah 4.d)
-    end note
-else Stok Mencukupi (Main Flow)
-    KeranjangController -> detail_pesanan : Perbarui/Simpan item baru (ID_Produk, Kuantitas, Harga) (Langkah 5)
-    activate detail_pesanan
-    return Status Simpan
-    deactivate detail_pesanan
-    
-    KeranjangController -> HalamanDetailProduk : Tampilkan notifikasi("Produk berhasil ditambahkan...") (Langkah 6)
-    deactivate KeranjangController
-    
-    HalamanDetailProduk -> Pengguna : Menerima notifikasi sukses
-end alt
+'     note over Pembeli, HalamanDetailProduk
+'         Mengubah jumlah produk (Langkah 4.c)
+'         Kembali ke Langkah 2 (Langkah 4.d)
+'     end note
+' else Stok Mencukupi (Main Flow)
+
+' end alt
 
 deactivate HalamanDetailProduk
 deactivate produk

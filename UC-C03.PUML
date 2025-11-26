@@ -7,46 +7,48 @@ boundary HalamanKeranjang
 control KeranjangController
 database detail_pesanan as "detail_pesanan\n(Keranjang)"
 
-box "Sistem Transaksi"
-    participant HalamanKeranjang
-    participant KeranjangController
-end box
+' box "Sistem Transaksi"
+'     participant HalamanKeranjang
+'     participant KeranjangController
+' end box
 
 activate Pembeli
-Pengguna -> HalamanKeranjang : Mengakses halaman Keranjang Belanja (Langkah 1)
+Pembeli -> HalamanKeranjang : Mengakses halaman Keranjang Belanja (Langkah 1)
 activate HalamanKeranjang
-HalamanKeranjang -> Pengguna : Tampilkan daftar produk di keranjang (Langkah 1 & 2)
+HalamanKeranjang -> Pembeli : Tampilkan daftar produk di keranjang (Langkah 1 & 2)
 
-Pengguna -> HalamanKeranjang : Menekan tombol "hapus" (Langkah 3)
+Pembeli -> HalamanKeranjang : Menekan tombol "hapus" (Langkah 3)
 
 HalamanKeranjang -> KeranjangController : hapusItemKeranjang(ID_ItemKeranjang)
 activate KeranjangController
 
-KeranjangController -> KeranjangController : Validasi perintah hapus (Langkah 4)
+KeranjangController -> detail_pesanan : Validasi perintah hapus (Langkah 4)
 
 KeranjangController -> detail_pesanan : Hapus item dari database
 activate detail_pesanan
 return Status Operasi (Berhasil/Gagal)
 
-alt Jika Proses Penghapusan Gagal (Alternative Flow 4.a)
-    note over KeranjangController
-        Kegagalan koneksi/Item tidak ditemukan
-    end note
-    KeranjangController -> HalamanKeranjang : Tampilkan notifikasi("Gagal: Produk tidak dapat dihapus...") (Langkah 4.b)
-    deactivate KeranjangController
+KeranjangController -> HalamanKeranjang : Muat ulang keranjang dan notifikasi("Produk berhasil dihapus") (Langkah 6)
+deactivate KeranjangController
+
+HalamanKeranjang -> Pembeli : Melihat daftar keranjang terbaru (Langkah 7)
+
+' alt Jika Proses Penghapusan Gagal (Alternative Flow 4.a)
+'     note over KeranjangController
+'         Kegagalan koneksi/Item tidak ditemukan
+'     end note
+'     KeranjangController -> HalamanKeranjang : Tampilkan notifikasi("Gagal: Produk tidak dapat dihapus...") (Langkah 4.b)
+'     deactivate KeranjangController
     
-    HalamanKeranjang -> Pengguna : Menerima notifikasi gagal
+'     HalamanKeranjang -> Pembeli : Menerima notifikasi gagal
     
-    note over Pengguna, HalamanKeranjang
-        Mencoba kembali (Langkah 4.c)
-        Kembali ke Langkah 3 (Langkah 4.d)
-    end note
-else Jika Proses Penghapusan Berhasil (Main Flow)
-    KeranjangController -> HalamanKeranjang : Muat ulang keranjang dan notifikasi("Produk berhasil dihapus") (Langkah 6)
-    deactivate KeranjangController
-    
-    HalamanKeranjang -> Pengguna : Melihat daftar keranjang terbaru (Langkah 7)
-end alt
+'     note over Pembeli, HalamanKeranjang
+'         Mencoba kembali (Langkah 4.c)
+'         Kembali ke Langkah 3 (Langkah 4.d)
+'     end note
+' else Jika Proses Penghapusan Berhasil (Main Flow)
+
+' end alt
 
 deactivate HalamanKeranjang
 deactivate detail_pesanan

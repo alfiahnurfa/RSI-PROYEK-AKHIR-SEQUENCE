@@ -7,10 +7,10 @@ boundary HalamanRegister
 control UserController
 database user as "user\n(Database)"
 
-box "Sistem Pendaftaran"
-    participant HalamanRegister
-    participant UserController
-end box
+' box "Sistem Pendaftaran"
+'     participant HalamanRegister
+'     participant UserController
+' end box
 
 activate Pengguna
 Pengguna -> HalamanRegister : Mengakses halaman Register
@@ -25,7 +25,7 @@ Pengguna -> HalamanRegister : Menekan tombol "Daftar Sekarang" (Langkah 3)
 HalamanRegister -> UserController : daftarPengguna(Data Register)
 activate UserController
 
-UserController -> UserController : Validasi data (Format, Kelengkapan, Keunikan Email) (Langkah 4)
+UserController -> user : Validasi data (Format, Kelengkapan, Keunikan Email) (Langkah 4)
 
 ' alt Gagal Validasi (Alternative Flow 4.a)
 '     UserController -> HalamanRegister : Tampilkan notifikasi("Pendaftaran Gagal") (Langkah 4.b)
@@ -37,23 +37,21 @@ UserController -> UserController : Validasi data (Format, Kelengkapan, Keunikan 
 '         Kembali ke Langkah 3 (Main Flow) / Lanjutkan input
 '     end note
 ' else Validasi Sukses (Langkah 4)
-'     UserController -> UserController : HASH Password
-'     UserController -> user : Simpan data pengguna baru(Data Hash, Status Aktif) (Langkah 5)
-'     activate user
-    
-'     note over user
-'         Simpan akun ke Database
-'     end note
-    
-'     user --> UserController : ID_Pengguna_Baru
-'     deactivate user
-
-'     UserController -> HalamanRegister : Tampilkan notifikasi("Pendaftaran Berhasil") (Langkah 6)
-'     deactivate UserController
-    
-'     HalamanRegister -> Pengguna : Menerima notifikasi berhasil (Langkah 7)
-'     deactivate HalamanRegister
+'     
 ' end alt
+
+UserController -> user : HASH Password
+    UserController -> user : Simpan data pengguna baru(Data Hash, Status Aktif) (Langkah 5)
+    activate user
+    
+    user --> UserController : ID_Pengguna_Baru
+    deactivate user
+
+    UserController -> HalamanRegister : Tampilkan notifikasi("Pendaftaran Berhasil") (Langkah 6)
+    deactivate UserController
+    
+    HalamanRegister -> Pengguna : Menerima notifikasi berhasil (Langkah 7)
+    deactivate HalamanRegister
 deactivate Pengguna
 
 @enduml

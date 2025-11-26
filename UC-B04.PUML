@@ -8,19 +8,19 @@ boundary HalamanDetailProduk
 control ProdukController
 database produk as "produk\n(Database)"
 
-box "Sistem Katalog & Detail"
-    participant HalamanKatalog
-    participant HalamanDetailProduk
-    participant ProdukController
-end box
+' box "Sistem Katalog & Detail"
+'     participant HalamanKatalog
+'     participant HalamanDetailProduk
+'     participant ProdukController
+' end box
 
 activate Pembeli
-Pengguna -> HalamanKatalog : Mengakses halaman katalog (Langkah 1)
+Pembeli -> HalamanKatalog : Mengakses halaman katalog (Langkah 1)
 activate HalamanKatalog
 
-Pengguna -> HalamanKatalog : Memilih salah satu produk (Langkah 2)
+Pembeli -> HalamanKatalog : Memilih salah satu produk (Langkah 2)
 
-Pengguna -> HalamanKatalog : Menekan tombol Detail (Langkah 3)
+Pembeli -> HalamanKatalog : Menekan tombol Detail (Langkah 3)
 HalamanKatalog -> ProdukController : ambilDetailProduk(ID_Produk)
 deactivate HalamanKatalog
 activate ProdukController
@@ -29,24 +29,26 @@ ProdukController -> produk : Query seluruh data detail produk (Langkah 4)
 activate produk
 return Data Produk Lengkap / Null (Langkah 4.a)
 
-alt Jika Produk Ditemukan & Status='Aktif' (Main Flow)
-    ProdukController -> HalamanDetailProduk : Tampilkan halaman detail(Data Produk) (Langkah 5)
-    deactivate ProdukController
-    activate HalamanDetailProduk
+ProdukController -> HalamanDetailProduk : Tampilkan halaman detail(Data Produk) (Langkah 5)
+deactivate ProdukController
+activate HalamanDetailProduk
+
+HalamanDetailProduk -> Pembeli : Menampilkan seluruh informasi produk lengkap (Langkah 6)
+deactivate HalamanDetailProduk
+
+' alt Jika Produk Ditemukan & Status='Aktif' (Main Flow)
+
+' else Jika Produk Tidak Ditemukan / Status='Arsip' (Alternative Flow 4.a)
+'     note over ProdukController
+'         Menghentikan proses pengambilan data
+'     end note
+'     ProdukController -> HalamanKatalog : Tampilkan notifikasi("Maaf, Produk Saat Ini Tidak Tersedia") (Langkah 4.b)
+'     deactivate ProdukController
+'     activate HalamanKatalog
     
-    HalamanDetailProduk -> Pembeli : Menampilkan seluruh informasi produk lengkap (Langkah 6)
-    deactivate HalamanDetailProduk
-else Jika Produk Tidak Ditemukan / Status='Arsip' (Alternative Flow 4.a)
-    note over ProdukController
-        Menghentikan proses pengambilan data
-    end note
-    ProdukController -> HalamanKatalog : Tampilkan notifikasi("Maaf, Produk Saat Ini Tidak Tersedia") (Langkah 4.b)
-    deactivate ProdukController
-    activate HalamanKatalog
-    
-    HalamanKatalog -> Pembeli : Menerima notifikasi
-    deactivate HalamanKatalog
-end alt
+'     HalamanKatalog -> Pembeli : Menerima notifikasi
+'     deactivate HalamanKatalog
+' end alt
 deactivate produk
 
 @enduml

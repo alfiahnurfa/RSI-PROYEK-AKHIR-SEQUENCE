@@ -9,41 +9,43 @@ boundary HalamanDetailBerita
 control BeritaController
 database berita as "berita\n(Database)"
 
-box "Sistem Informasi Berita"
-    participant HalamanDashboard
-    participant HalamanDaftarBerita
-    participant HalamanDetailBerita
-    participant BeritaController
-end box
+' box "Sistem Informasi Berita"
+'     participant HalamanDashboard
+'     participant HalamanDaftarBerita
+'     participant HalamanDetailBerita
+'     participant BeritaController
+' end box
 
 activate Pembeli
-Pengguna -> HalamanDashboard : Membuka dashboard website (Langkah 1)
+Pembeli -> HalamanDashboard : Membuka dashboard website (Langkah 1)
 activate HalamanDashboard
 
-alt Akses Melalui Navbar (Langkah 2)
-    Pengguna -> HalamanDashboard : Mengakses halaman berita melalui navbar
-    deactivate HalamanDashboard
-    
-    HalamanDaftarBerita -> BeritaController : ambilDaftarBeritaTerbit()
-    activate BeritaController
-    BeritaController -> berita : Query berita berstatus 'Terbit'
-    activate berita
-    return List Ringkasan Berita
-    deactivate berita
-    
-    BeritaController -> HalamanDaftarBerita : Tampilkan daftar ringkasan (Langkah 3)
-    deactivate BeritaController
-    activate HalamanDaftarBerita
-    
-else Akses Melalui Dashboard (Alternative Flow 2.a, 3.a)
-    Pengguna -> HalamanDashboard : Menggulir dan menekan tombol "Lihat Semua"
-    deactivate HalamanDashboard
-    
-    HalamanDaftarBerita -> BeritaController : ambilDaftarBeritaTerbit()
-    ' (Langkah 3 dan 3.a berlanjut ke proses pengambilan data yang sama di atas)
-end alt
+Pembeli -> HalamanDashboard : Mengakses halaman berita melalui navbar
+deactivate HalamanDashboard
 
-Pengguna -> HalamanDaftarBerita : Memilih berita yang ingin dibaca (Langkah 4)
+HalamanDaftarBerita -> BeritaController : ambilDaftarBeritaTerbit()
+activate BeritaController
+BeritaController -> berita : Query berita berstatus 'Terbit'
+activate berita
+return List Ringkasan Berita
+deactivate berita
+
+BeritaController -> HalamanDaftarBerita : Tampilkan daftar ringkasan (Langkah 3)
+deactivate BeritaController
+activate HalamanDaftarBerita
+
+' alt Akses Melalui Navbar (Langkah 2)
+
+    
+' else Akses Melalui Dashboard (Alternative Flow 2.a, 3.a)
+'     Pembeli -> HalamanDashboard : Menggulir dan menekan tombol "Lihat Semua"
+'     deactivate HalamanDashboard
+    
+'     HalamanDaftarBerita -> BeritaController : ambilDaftarBeritaTerbit()
+'     ' (Langkah 3 dan 3.a berlanjut ke proses pengambilan data yang sama di atas)
+' end alt
+
+Pembeli -> HalamanDaftarBerita : Memilih berita yang ingin dibaca (Langkah 4)
 HalamanDaftarBerita -> BeritaController : ambilDetailBerita(ID_Berita)
 deactivate HalamanDaftarBerita
 activate BeritaController
@@ -53,20 +55,22 @@ activate berita
 return Data Detail Berita / Null (Langkah 5.a)
 deactivate berita
 
-alt Berita Ditemukan (Main Flow)
-    BeritaController -> HalamanDetailBerita : Tampilkan halaman detail(Data Detail) (Langkah 6)
-    deactivate BeritaController
-    activate HalamanDetailBerita
+BeritaController -> HalamanDetailBerita : Tampilkan halaman detail(Data Detail) (Langkah 6)
+deactivate BeritaController
+activate HalamanDetailBerita
+
+HalamanDetailBerita -> Pembeli : Membaca berita yang ditampilkan (Langkah 7)
+deactivate HalamanDetailBerita
+
+' alt Berita Ditemukan (Main Flow)
+
+' else Berita Tidak Ditemukan (Alternative Flow 5.a)
+'     BeritaController -> HalamanDaftarBerita : Tampilkan notifikasi("Artikel Berita Tidak Ditemukan") (Langkah 6.a)
+'     deactivate BeritaController
     
-    HalamanDetailBerita -> Pembeli : Membaca berita yang ditampilkan (Langkah 7)
-    deactivate HalamanDetailBerita
-else Berita Tidak Ditemukan (Alternative Flow 5.a)
-    BeritaController -> HalamanDaftarBerita : Tampilkan notifikasi("Artikel Berita Tidak Ditemukan") (Langkah 6.a)
-    deactivate BeritaController
-    
-    activate HalamanDaftarBerita
-    HalamanDaftarBerita -> Pembeli : Menerima notifikasi gagal
-    deactivate HalamanDaftarBerita
-end alt
+'     activate HalamanDaftarBerita
+'     HalamanDaftarBerita -> Pembeli : Menerima notifikasi gagal
+'     deactivate HalamanDaftarBerita
+' end alt
 
 @enduml

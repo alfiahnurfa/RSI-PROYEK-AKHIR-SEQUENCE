@@ -6,50 +6,48 @@ actor Pembeli
 boundary HalamanDetailPesanan
 control KomplainController
 database komplain as "komplain\n(Database)"
-participant Admin as "Admin\n(Sistem Penerima)"
+' participant Admin as "Admin\n(Sistem Penerima)"
 
-box "Sistem Pengaduan"
-    participant HalamanDetailPesanan
-    participant KomplainController
-end box
+' box "Sistem Pengaduan"
+'     participant HalamanDetailPesanan
+'     participant KomplainController
+' end box
 
 activate Pembeli
-Pengguna -> HalamanDetailPesanan : Mengakses halaman detail pesanan (ID_Pesanan) (Langkah 1)
+Pembeli -> HalamanDetailPesanan : Mengakses halaman detail pesanan (ID_Pesanan) (Langkah 1)
 activate HalamanDetailPesanan
 
-HalamanDetailPesanan -> HalamanDetailPesanan : Periksa Status Pesanan (Langkah 1 & 2)
+HalamanDetailPesanan -> KomplainController : Periksa Status Pesanan (Langkah 1 & 2)
 
-alt Jika Status = "Selesai" (Main Flow)
-    HalamanDetailPesanan -> Pembeli : Tampilkan tombol "Beri Pengaduan" (Langkah 2)
-    
-    Pengguna -> HalamanDetailPesanan : Menekan tombol "Beri Pengaduan" (Langkah 3)
-    HalamanDetailPesanan -> HalamanDetailPesanan : Tampilkan formulir pengaduan (Langkah 3)
-    
-    Pengguna -> HalamanDetailPesanan : Mengisi formulir (Judul, Deskripsi, Bukti) (Langkah 4)
-    
-    Pengguna -> HalamanDetailPesanan : Mengirimkan pengaduan (Langkah 5)
-    HalamanDetailPesanan -> KomplainController : ajukanKomplain(Data Pengaduan)
-    activate KomplainController
-    
-    KomplainController -> KomplainController : Validasi data (Langkah 5)
+HalamanDetailPesanan -> Pembeli : Tampilkan tombol "Beri Pengaduan" (Langkah 2)
 
-    KomplainController -> komplain : Simpan laporan (Status='Baru') (Langkah 6.a)
-    activate komplain
-    return ID_Komplain
-    deactivate komplain
+Pembeli -> HalamanDetailPesanan : Menekan tombol "Beri Pengaduan" (Langkah 3)
+HalamanDetailPesanan -> KomplainController : Tampilkan formulir pengaduan (Langkah 3)
 
-    KomplainController -> Admin : Teruskan notifikasi laporan baru (Langkah 6.b)
+Pembeli -> HalamanDetailPesanan : Mengisi formulir (Judul, Deskripsi, Bukti) (Langkah 4)
 
-    KomplainController -> HalamanDetailPesanan : Tampilkan notifikasi("Laporan Berhasil Dikirim") (Langkah 7)
-    deactivate KomplainController
+Pembeli -> HalamanDetailPesanan : Mengirimkan pengaduan (Langkah 5)
+HalamanDetailPesanan -> KomplainController : ajukanKomplain(Data Pengaduan)
+activate KomplainController
 
-else Jika Status Belum "Selesai" (Alternative Flow 2.a)
-    HalamanDetailPesanan -> Pembeli : Tombol "Beri Pengaduan" dinonaktifkan / disembunyikan (Langkah 3.a)
+KomplainController -> komplain : Validasi data (Langkah 5)
+KomplainController -> komplain : Simpan laporan (Status='Baru') (Langkah 6.a)
+activate komplain
+return ID_Komplain
+deactivate komplain
+' KomplainController -> Admin : Teruskan notifikasi laporan baru (Langkah 6.b)
+KomplainController -> Pembeli : Tampilkan notifikasi("Laporan Berhasil Dikirim") (Langkah 7)
+deactivate KomplainController
+
+' alt Jika Status = "Selesai" (Main Flow)
+
+' else Jika Status Belum "Selesai" (Alternative Flow 2.a)
+'     HalamanDetailPesanan -> Pembeli : Tombol "Beri Pengaduan" dinonaktifkan / disembunyikan (Langkah 3.a)
     
-    note over HalamanDetailPesanan
-        Pesan: Pengaduan hanya bisa diajukan setelah pesanan selesai.
-    end note
-end alt
+'     note over HalamanDetailPesanan
+'         Pesan: Pengaduan hanya bisa diajukan setelah pesanan selesai.
+'     end note
+' end alt
 deactivate HalamanDetailPesanan
 
 @enduml
