@@ -29,9 +29,9 @@ UserController -> user : Cari data pengguna (berdasarkan email)
 activate user
 return DataPenggunaTersimpan
 
-UserController -> UserController : Verifikasi Password (Data input vs Hash tersimpan) (Langkah 4)
+UserController -> user : Verifikasi Password (Data input vs Hash tersimpan) (Langkah 4)
 
-    UserController -> UserController : Buat sesi login baru (Langkah 5)
+    UserController -> user : Buat sesi login baru (Langkah 5)
     
     UserController -> HalamanLogin : Tampilkan notifikasi("Login Berhasil") (Langkah 6)
     deactivate UserController
