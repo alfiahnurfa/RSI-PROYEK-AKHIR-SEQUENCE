@@ -1,0 +1,141 @@
+@startuml
+skinparam ClassAttributeIconStyle none
+
+' ---------------------------------
+' Kelas Model (Tanpa Metode)
+' ---------------------------------
+class User {
+  + id_pengguna : int <<PK>>
+  --
+  + nama : string
+  + email : string
+  - password : string
+  + nomor_telepon : string
+  + alamat : string
+  + foto_profil : string
+  + role : string
+}
+
+class Produk {
+  + id_produk : int <<PK>>
+  --
+  + nama_produk : string
+  + kategori_produk : string
+  + deskripsi_produk : string
+  + berat_produk : float
+  + harga_produk : float
+  + stok_produk : int
+  + foto_produk : string
+  + status_produk : string
+}
+
+class Pesanan {
+  + id_pesanan : int <<PK>>
+  --
+  + id_pembeli : int <<FK>>
+  + alamat_pengiriman : string
+  + status_pemesanan : string
+  + waktu_pemesanan : DateTime
+}
+
+class DetailPesanan {
+  + id_detail_pesanan : int <<PK>>
+  --
+  + id_pesanan : int <<FK>>
+  + id_produk : int <<FK>>
+  + kuantitas_produk : int
+  + harga_produk_tersimpan : float
+}
+
+class Komplain {
+  + id_komplain : int <<PK>>
+  --
+  + id_pesanan : int <<FK>>
+  + judul_komplain : string
+  + deskripsi_komplain : string
+  + bukti_komplain : string
+  + tanggal_pengaduan : DateTime
+  + status_komplain : string
+}
+
+class Berita {
+  + id_berita : int <<PK>>
+  --
+  + id_penulis : int <<FK>>
+  + judul_berita : string
+  + isi_berita : text
+  + gambar_berita : string
+  + tanggal_publikasi : DateTime
+}
+
+' ---------------------------------
+' Kelas Controller (Logika Bisnis)
+' ---------------------------------
+class UserController {
+  + daftarPengguna() : array
+  + masuk(email: string, pass: string) : User
+  + ambilProfil(id: int) : User
+  + ubahProfil(id: int, data: array) : bool
+  + ubahKataSandi(id: int, newPass: string) : bool
+  + logout() : void
+}
+
+class ProdukController {
+  + ambilSemuaProduk() : array
+  + cariProduk(keyword: string) : array
+  + ambilDetailProduk(id: int) : Produk
+  + tambahProduk(data: array) : bool
+  + ubahProduk(id: int, data: array) : bool
+  + hapusProduk(id: int) : bool
+}
+
+class PesananController {
+  + ambilDetailPesanan(id: int) : Pesanan
+  + buatPesanan(userId: int, cartItems: array) : bool
+  + ambilDaftarPesanan(userId: int) : array
+  + ambilSemuaPesanan() : array
+  + perbaruiStatusPesanan(id: int, status: string) : bool
+}
+
+class KomplainController {
+  + ajukanKomplain(data: array) : bool
+  + ambilDaftarKomplain() : array
+  + ambilDetailKomplain(id: int) : Komplain
+}
+
+class BeritaController {
+  + ambilDaftarBerita() : array
+  + ambilDetailBerita(id: int) : Berita
+  + tambahBerita(data: array) : bool
+  + hapusBerita(id: int) : bool
+  + ubahBerita(id: int, data: array) : bool
+}
+
+' ---------------------------------
+' Hubungan Model-Model (Asosiasi & Komposisi)
+' ---------------------------------
+User "1" -- "0..*" Pesanan : adalah_pembeli >
+User "1" -- "0..*" Berita : adalah_penulis >
+
+Pesanan "1" *-- "1..*" DetailPesanan : terdiri_dari >
+Produk "1" -- "0..*" DetailPesanan : dijual_di >
+
+Pesanan "1" -- "0..1" Komplain : memiliki >
+
+' ---------------------------------
+' Hubungan Controller-Model (Dependensi)
+' Diperbarui: PesananController menggunakan Pesanan dan DetailPesanan
+' ---------------------------------
+UserController ..> User : menggunakan
+ProdukController ..> Produk : menggunakan
+
+PesananController ..> Pesanan : menggunakan
+' **PesananController ..> DetailPesanan : menggunakan**
+PesananController ..> Produk : menggunakan ' Tetap ada karena perlu cek stok/harga produk saat buat pesanan
+
+KomplainController ..> Komplain : menggunakan
+KomplainController ..> Pesanan : menggunakan
+
+BeritaController ..> Berita : menggunakan
+
+@enduml

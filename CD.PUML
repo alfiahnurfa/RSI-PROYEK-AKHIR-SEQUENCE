@@ -1,0 +1,153 @@
+@startuml
+skinparam ClassAttributeIconStyle none
+
+class User {
+  + id_pengguna : int <<PK>>
+  --
+  + nama : string
+  + email : string
+  - password : string
+  + nomor_telepon : string
+  + alamat : string
+  + foto_profil : string
+  + role : string
+  --
+  + find(id: int) : User
+  + save() : bool
+  + updatePassword(newPass: string) : bool
+}
+
+class Produk {
+  + id_produk : int <<PK>>
+  --
+  + nama_produk : string
+  + kategori_produk : string
+  + deskripsi_produk : string
+  + berat_produk : float
+  + harga_produk : float
+  + stok_produk : int
+  + foto_produk : string
+  + status_produk : string
+  --
+  + findAll() : array
+  + findByCategory(category: string) : array
+  + updateStock(quantity: int) : bool
+}
+
+class Pesanan {
+  + id_pesanan : int <<PK>>
+  --
+  + id_pembeli : int <<FK>>
+  + alamat_pengiriman : string
+  + status_pemesanan : string
+  + waktu_pemesanan : DateTime
+  --
+  + findByUser(userId: int) : array
+  + updateStatus(newStatus: string) : bool
+}
+
+class DetailPesanan {
+  + id_detail_pesanan : int <<PK>>
+  --
+  + id_pesanan : int <<FK>>
+  + id_produk : int <<FK>>
+  + kuantitas_produk : int
+  + harga_produk_tersimpan : float
+  --
+  + findByOrderId(orderId: int) : array
+}
+
+class Komplain {
+  + id_komplain : int <<PK>>
+  --
+  + id_pesanan : int <<FK>>
+  + judul_komplain : string
+  + deskripsi_komplain : string
+  + bukti_komplain : string
+  + tanggal_pengaduan : DateTime
+  + status_komplain : string
+  --
+  + create(data: array) : bool
+  + findByOrder(orderId: int) : Complaint
+}
+
+class Berita {
+  + id_berita : int <<PK>>
+  --
+  + id_penulis : int <<FK>>
+  + judul_berita : string
+  + isi_berita : text
+  + gambar_berita : string
+  + tanggal_publikasi : DateTime
+  --
+  + publish() : bool
+  + archive() : bool
+}
+
+' ---------------------------------
+' Classes Controller (Logika Bisnis)
+' ---------------------------------
+class UserController {
+  + daftarPengguna() : array
+  + masuk(email: string, pass: string) : User
+  + ambilProfil(id: int) : User
+  + ubahProfil(id: int, data: array) : bool
+  + ubahKataSandi(id: int, newPass: string) : bool
+  + logout() : void
+}
+
+class ProdukController {
+  + ambilSemuaProduk() : array
+  + cariProduk(keyword: string) : array
+  + ambilDetailProduk(id: int) : Product
+  + tambahProduk(data: array) : bool
+  + ubahProduk(id: int, data: array) : bool
+  + hapusProduk(id: int) : bool
+}
+
+class PesananController {
+  + ambilDetailPesanan(id: int) : Order
+  + buatPesanan(userId: int, cartItems: array) : bool
+  + ambilDaftarPesanan(userId: int) : array
+  + ambilSemuaPesanan() : array
+  + perbaruiStatusPesanan(id: int, status: string) : bool
+}
+
+class KomplainController {
+  + ajukanKomplain(data: array) : bool
+  + ambilDaftarKomplain() : array
+  + ambilDetailKomplain(id: int) : Complaint
+}
+
+class BeritaController {
+  + ambilDaftarBerita() : array
+  + ambilDetailBerita(id: int) : News
+  + tambahBerita(data: array) : bool
+  + hapusBerita(id: int) : bool
+  + ubahBerita(id: int, data: array) : bool
+}
+
+' ---------------------------------
+' Hubungan Model-Model (Asosiasi & Komposisi)
+' ---------------------------------
+User "1" -- "0..*" Pesanan : adalah_pembeli >
+User "1" -- "0..*" Berita : adalah_penulis >
+
+Pesanan "1" *-- "1..*" DetailPesanan : terdiri_dari >
+Produk "1" -- "0..*" DetailPesanan : dijual_di >
+
+Pesanan "1" -- "0..1" Komplain : memiliki >
+
+' ---------------------------------
+' Hubungan Controller-Model (Dependensi)
+' ---------------------------------
+UserController ..> User : menggunakan
+ProductController ..> Product : menggunakan
+PesananController ..> Pesanan : menggunakan
+PesananController ..> PesananDetail : menggunakan
+PesananController ..> Product : menggunakan
+KomplainController ..> Komplain : menggunakan
+KomplainController ..> Pesanan : menggunakan
+BeritaController ..> Berita : menggunakan
+
+@enduml
