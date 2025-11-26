@@ -1,0 +1,62 @@
+@startuml SD-UC-B03_MemfilterProduk
+title Sequence Diagram UC-B03: Memfilter Produk Berdasarkan Kriteria
+skinparam style strictuml
+
+actor Pembeli
+boundary HalamanKatalog
+control ProdukController
+database produk as "produk\n(Database)"
+
+box "Sistem Filter Katalog"
+    participant HalamanKatalog
+    participant ProdukController
+end box
+
+activate Pembeli
+Pembeli -> HalamanKatalog : Mengakses halaman katalog (Langkah 1 & 1.a)
+activate HalamanKatalog
+
+alt Filter Berdasarkan Kategori (Main Flow)
+    Pembeli -> HalamanKatalog : Memilih kategori (Langkah 2)
+    HalamanKatalog -> ProdukController : filterProduk(kategori)
+    activate ProdukController
+    
+    ProdukController -> produk : Melakukan filter database berdasarkan Kategori (Langkah 3)
+    activate produk
+    return List Produk Filtered / List Kosong (Langkah 3.b)
+    deactivate produk
+    
+    alt Hasil Ditemukan
+        ProdukController -> HalamanKatalog : Tampilkan produk hasil filter (Langkah 4)
+    else Hasil Tidak Ditemukan (Alternative Flow)
+        ProdukController -> HalamanKatalog : Tampilkan notifikasi("Tidak ada produk yang sesuai...")
+    end
+    deactivate ProdukController
+    
+    HalamanKatalog -> Pembeli : Melihat produk yang tersaring (Langkah 5)
+    
+else Filter Berdasarkan Harga (Alternative Flow 2.a)
+    Pembeli -> HalamanKatalog : Memilih rentang harga (Harga Min, Harga Max)
+    
+    Pembeli -> HalamanKatalog : Menerapkan filter (Langkah 3.a)
+    HalamanKatalog -> ProdukController : filterProduk(harga_min, harga_max)
+    activate ProdukController
+
+    ProdukController -> produk : Melakukan filter database berdasarkan Rentang Harga (Langkah 4.a)
+    activate produk
+    return List Produk Filtered / List Kosong (Langkah 3.b)
+    deactivate produk
+
+    alt Hasil Ditemukan
+        ProdukController -> HalamanKatalog : Tampilkan produk hasil filter (Langkah 5.a)
+    else Hasil Tidak Ditemukan (Alternative Flow)
+        ProdukController -> HalamanKatalog : Tampilkan notifikasi("Tidak ada produk yang sesuai...")
+    end
+    deactivate ProdukController
+
+    HalamanKatalog -> Pembeli : Melihat produk yang tersaring (Langkah 6)
+    
+end alt
+deactivate HalamanKatalog
+
+@enduml

@@ -1,0 +1,56 @@
+@startuml SD-UC-A02_Login
+title Sequence Diagram UC-A02: Masuk ke Akun Pengguna
+skinparam style strictuml
+
+actor Pengguna
+boundary HalamanLogin
+control UserController
+database user as "user\n(Database)"
+
+box "Sistem Otentikasi"
+    participant HalamanLogin
+    participant UserController
+end box
+
+activate Pengguna
+Pengguna -> HalamanLogin : Mengakses halaman Login (Langkah 1)
+activate HalamanLogin
+
+HalamanLogin -> Pengguna : Tampilkan formulir login
+
+Pengguna -> HalamanLogin : Mengisi email dan password (Langkah 2)
+
+Pengguna -> HalamanLogin : Menekan tombol "Masuk" (Langkah 3)
+
+HalamanLogin -> UserController : masuk(email, password)
+activate UserController
+
+UserController -> user : Cari data pengguna (berdasarkan email)
+activate user
+return DataPenggunaTersimpan
+
+UserController -> UserController : Verifikasi Password (Data input vs Hash tersimpan) (Langkah 4)
+
+' alt Jika Verifikasi Gagal (Alternative Flow 4.a)
+'     UserController -> HalamanLogin : Tampilkan notifikasi("Login Gagal, Email/Password Salah.") (Langkah 4.b)
+'     deactivate UserController
+    
+'     HalamanLogin -> Pengguna : Tampilkan notifikasi gagal
+    
+'     note over Pengguna, HalamanLogin
+'         Memperbaiki kredensial atau opsi Lupa Password (Langkah 4.c)
+'         Kembali ke Langkah 2 (Langkah 4.d)
+'     end note
+' else Jika Verifikasi Berhasil (Main Flow)
+'     UserController -> UserController : Buat sesi login baru (Langkah 5)
+    
+'     UserController -> HalamanLogin : Tampilkan notifikasi("Login Berhasil") (Langkah 6)
+'     deactivate UserController
+    
+'     HalamanLogin -> Pengguna : Arahkan ke Halaman Utama (Langkah 6, 7)
+'     deactivate HalamanLogin
+' end alt
+
+deactivate user
+
+@enduml

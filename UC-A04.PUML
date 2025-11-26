@@ -1,0 +1,60 @@
+@startuml SD-UC-A04_UbahKataSandi
+title Sequence Diagram UC-A04: Mengubah Kata Sandi Akun
+skinparam style strictuml
+
+actor Pengguna
+boundary HalamanProfil
+control UserController
+database user as "user\n(Database)"
+
+box "Sistem Keamanan Akun"
+    participant HalamanProfil
+    participant UserController
+end box
+
+activate Pengguna
+Pengguna -> HalamanProfil : Mengakses halaman profil (Langkah 1)
+activate HalamanProfil
+
+Pengguna -> HalamanProfil : Klik "Ubah Kata Sandi" (Langkah 2)
+HalamanProfil -> HalamanProfil : Tampilkan formulir perubahan sandi (Langkah 2)
+
+Pengguna -> HalamanProfil : Input Sandi Lama, Sandi Baru, Konfirmasi (Langkah 3)
+
+Pengguna -> HalamanProfil : Menekan tombol "Simpan Kata Sandi" (Langkah 4)
+
+HalamanProfil -> UserController : ubahKataSandi(id_pengguna, sandi_lama, sandi_baru)
+activate UserController
+
+UserController -> user : Ambil hash sandi lama
+activate user
+user --> UserController : Hash Sandi Lama Tersimpan
+deactivate user
+
+UserController -> UserController : Validasi (Sandi Lama cocok? Sandi Baru=Konfirmasi?) (Langkah 4)
+
+' alt Gagal Validasi (Alternative Flow 4.a)
+'     UserController -> HalamanProfil : Tampilkan notifikasi("Gagal: Kredensial tidak sesuai...") (Langkah 4.b)
+'     deactivate UserController
+    
+'     HalamanProfil -> Pengguna : Tampilkan notifikasi gagal
+    
+'     note over Pengguna, HalamanProfil
+'         Memperbaiki input (Langkah 4.c)
+'         Kembali ke Langkah 3 (Langkah 4.d)
+'     end note
+' else Validasi Sukses (Main Flow)
+'     UserController -> UserController : HASH Sandi Baru
+'     UserController -> user : Update hash sandi baru (Langkah 5)
+'     activate user
+'     user --> UserController : Status Update
+'     deactivate user
+    
+'     UserController -> HalamanProfil : Tampilkan notifikasi("Kata Sandi Berhasil Diperbarui") (Langkah 6)
+'     deactivate UserController
+    
+'     HalamanProfil -> Pengguna : Notifikasi sukses
+'     deactivate HalamanProfil
+' end alt
+
+@enduml

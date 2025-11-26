@@ -1,0 +1,52 @@
+@startuml SD-UC-I01_MelihatDaftarPesananAdmin
+title Sequence Diagram UC-I01: Melihat Daftar Pesanan yang Masuk (Admin)
+skinparam style strictuml
+
+actor Admin
+boundary HalamanDaftarPesanan
+control PesananController
+database pesanan as "pesanan\n(Database)"
+
+box "Sistem Manajemen Pesanan"
+    participant HalamanDaftarPesanan
+    participant PesananController
+end box
+
+activate Admin
+Admin -> HalamanDaftarPesanan : Mengakses menu "Pesanan" (Langkah 1)
+activate HalamanDaftarPesanan
+
+alt Melihat Daftar Keseluruhan (Main Flow)
+    HalamanDaftarPesanan -> PesananController : ambilDaftarPesanan(status="Semua")
+    activate PesananController
+
+    PesananController -> pesanan : Mengambil daftar seluruh pesanan (Langkah 2)
+    activate pesanan
+    return List Pesanan Lengkap
+    deactivate pesanan
+    
+    PesananController -> HalamanDaftarPesanan : Tampilkan daftar pesanan (Langkah 3)
+    deactivate PesananController
+
+    HalamanDaftarPesanan -> Admin : Melihat dan meninjau daftar pesanan (Langkah 4)
+    
+else Menggunakan Filter Status (Alternative Flow 1.a)
+    Admin -> HalamanDaftarPesanan : Memilih tab status pesanan (e.g., "Selesai") (Langkah 1.a)
+
+    HalamanDaftarPesanan -> PesananController : ambilDaftarPesanan(status_filter)
+    activate PesananController
+    
+    PesananController -> pesanan : Query database untuk status yang dipilih (Langkah 2.a)
+    activate pesanan
+    return List Pesanan Terfilter
+    deactivate pesanan
+
+    PesananController -> HalamanDaftarPesanan : Muat ulang tabel dengan daftar terfilter (Langkah 3.a)
+    deactivate PesananController
+
+    HalamanDaftarPesanan -> Admin : Melihat dan meninjau daftar pesanan terfilter (Langkah 4)
+end alt
+
+deactivate HalamanDaftarPesanan
+
+@enduml

@@ -1,0 +1,60 @@
+@startuml SD-UC-A03_UpdateProfil
+title Sequence Diagram UC-A03: Mengelola dan Memperbarui Data Profil
+skinparam style strictuml
+
+actor Pengguna
+boundary HalamanProfil
+control UserController
+database user as "user\n(Database)"
+
+box "Sistem Profil"
+    participant HalamanProfil
+    participant UserController
+end box
+
+activate Pengguna
+
+Pengguna -> HalamanProfil : Mengakses halaman profil (Langkah 1)
+activate HalamanProfil
+HalamanProfil -> UserController : ambilProfil(id_pengguna)
+activate UserController
+UserController -> user : Query data profil
+activate user
+user --> UserController : Data Profil Terkini
+deactivate user
+UserController --> HalamanProfil : Tampilkan Data Profil (Langkah 1)
+deactivate UserController
+
+Pengguna -> HalamanProfil : Mengisi/mengubah informasi profil (Langkah 3)
+
+Pengguna -> HalamanProfil : Menekan tombol "Simpan Profil" (Langkah 4)
+
+HalamanProfil -> UserController : perbaruiProfil(id_pengguna, data_update)
+activate UserController
+
+UserController -> UserController : Validasi format data (Langkah 5)
+
+' alt Gagal Validasi (Alternative Flow 5.a)
+'     UserController -> HalamanProfil : Tampilkan notifikasi("Update Profil Gagal") (Langkah 5.b)
+'     deactivate UserController
+    
+'     HalamanProfil -> Pengguna : Tampilkan notifikasi gagal & sorot kolom
+    
+'     note over Pengguna, HalamanProfil
+'         Memperbaiki data (Langkah 5.c)
+'         Kembali ke Langkah 4 (Langkah 5.d)
+'     end note
+' else Validasi Sukses (Main Flow)
+'     UserController -> user : Simpan data profil baru (Langkah 6)
+'     activate user
+'     user --> UserController : Status Update
+'     deactivate user
+    
+'     UserController -> HalamanProfil : Tampilkan notifikasi("Update Profil Berhasil") (Langkah 7)
+'     deactivate UserController
+    
+'     HalamanProfil -> Pengguna : Tampilkan profil terbaru (Langkah 7, 8)
+'     deactivate HalamanProfil
+' end alt
+
+@enduml

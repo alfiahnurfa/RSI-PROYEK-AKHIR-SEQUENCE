@@ -1,0 +1,56 @@
+@startuml SD-UC-H05_PerbaruiStok
+title Sequence Diagram UC-H05: Memperbarui Stok Produk
+skinparam style strictuml
+
+actor Admin
+boundary HalamanKelolaProduk
+control ProdukController
+database produk as "produk\n(Database)"
+
+box "Sistem Inventaris"
+    participant HalamanKelolaProduk
+    participant ProdukController
+end box
+
+activate Admin
+Admin -> HalamanKelolaProduk : Mengakses halaman kelola produk (Langkah 1)
+activate HalamanKelolaProduk
+
+HalamanKelolaProduk -> Admin : Tampilkan daftar produk beserta field stok (Langkah 1 & 2)
+
+Admin -> HalamanKelolaProduk : Mengedit nilai stok dengan kuantitas baru (Langkah 3)
+
+Admin -> HalamanKelolaProduk : Menekan tombol "Perbarui Stok" (Langkah 4)
+
+HalamanKelolaProduk -> ProdukController : perbaruiStok(ID_Produk, Nilai_Stok_Baru)
+activate ProdukController
+
+ProdukController -> ProdukController : Validasi Nilai Stok Baru (Langkah 5)
+
+alt Jika Nilai Stok Tidak Valid (Alternative Flow 5.a)
+    ProdukController -> HalamanKelolaProduk : Tampilkan notifikasi("Gagal: Nilai stok tidak valid.") (Langkah 6.a)
+    deactivate ProdukController
+    
+    HalamanKelolaProduk -> Admin : Menerima notifikasi gagal
+    
+    note over Admin, HalamanKelolaProduk
+        Memperbaiki nilai stok (Langkah 7.a)
+        Kembali ke Langkah 4 (Langkah 7.b)
+    end note
+else Jika Nilai Stok Valid (Main Flow)
+    ProdukController -> produk : Memperbarui nilai stok_produk di database (Langkah 6)
+    activate produk
+    return Status Update
+    deactivate produk
+    
+    ProdukController -> HalamanKelolaProduk : Tampilkan notifikasi("Stok produk berhasil diperbarui") (Langkah 7)
+    
+    ProdukController -> HalamanKelolaProduk : Muat ulang data (Langkah 8)
+    deactivate ProdukController
+    
+    HalamanKelolaProduk -> Admin : Melihat nilai stok terbaru (Langkah 8)
+end alt
+
+deactivate HalamanKelolaProduk
+
+@enduml

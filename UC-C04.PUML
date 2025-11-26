@@ -1,0 +1,61 @@
+@startuml SD-UC-C04_UbahKuantitas
+title Sequence Diagram UC-C04: Mengubah Kuantitas Produk di Keranjang Belanja
+skinparam style strictuml
+
+actor Pembeli
+boundary HalamanKeranjang
+control KeranjangController
+database produk as "produk\n(Database Stok)"
+database detail_pesanan as "detail_pesanan\n(Keranjang)"
+
+box "Sistem Inventaris & Transaksi"
+    participant HalamanKeranjang
+    participant KeranjangController
+end box
+
+activate Pembeli
+Pengguna -> HalamanKeranjang : Mengakses halaman Keranjang Belanja (Langkah 1)
+activate HalamanKeranjang
+HalamanKeranjang -> Pengguna : Tampilkan daftar produk dan kuantitas (Langkah 1)
+
+Pengguna -> HalamanKeranjang : Menekan "+" / "-" atau mengedit kuantitas (Langkah 2)
+
+HalamanKeranjang -> KeranjangController : perbaruiKuantitas(ID_Item, Kuantitas_Baru)
+activate KeranjangController
+
+KeranjangController -> produk : Verifikasi ketersediaan stok untuk Kuantitas_Baru (Langkah 3)
+activate produk
+return Status Stok
+
+alt Stok Tidak Mencukupi (Alternative Flow 3.a)
+    note over KeranjangController
+        Kuantitas baru > Stok tersedia
+    end note
+    KeranjangController -> HalamanKeranjang : Tampilkan notifikasi("Gagal: Stok Produk Tidak Mencukupi.") (Langkah 4.a)
+    deactivate KeranjangController
+
+    HalamanKeranjang -> Pengguna : Menerima notifikasi gagal (Langkah 5.a)
+    
+    note over Pengguna, HalamanKeranjang
+        Memperbaiki kuantitas (Langkah 5.a)
+        Kembali ke Langkah 2 (Langkah 5.b)
+    end note
+else Stok Mencukupi (Main Flow)
+    KeranjangController -> detail_pesanan : Perbarui nilai kuantitas (Langkah 4)
+    activate detail_pesanan
+    
+    KeranjangController -> KeranjangController : Hitung ulang subtotal
+    
+    detail_pesanan --> KeranjangController : Status Update
+    deactivate detail_pesanan
+    
+    KeranjangController -> HalamanKeranjang : Muat ulang daftar keranjang (Langkah 5)
+    deactivate KeranjangController
+    
+    HalamanKeranjang -> Pembeli : Melihat kuantitas dan subtotal yang diperbarui (Langkah 6)
+end alt
+
+deactivate HalamanKeranjang
+deactivate produk
+
+@enduml

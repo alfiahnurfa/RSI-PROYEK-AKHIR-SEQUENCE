@@ -1,0 +1,70 @@
+@startuml SD-UC-K04_PerbaruiBerita
+title Sequence Diagram UC-K04: Memperbarui Konten Berita (Admin)
+skinparam style strictuml
+
+actor Admin
+boundary HalamanDaftarBerita
+boundary HalamanFormEditBerita
+control BeritaController
+database berita as "berita\n(Database)"
+
+box "Sistem Manajemen Berita"
+    participant HalamanDaftarBerita
+    participant HalamanFormEditBerita
+    participant BeritaController
+end box
+
+activate Admin
+Admin -> HalamanDaftarBerita : Mengakses halaman daftar berita (Langkah 1)
+activate HalamanDaftarBerita
+
+HalamanDaftarBerita -> Admin : Tampilkan daftar berita (Langkah 1 & 2)
+
+Admin -> HalamanDaftarBerita : Memilih berita & menekan tombol "Edit" (Langkah 3)
+HalamanDaftarBerita -> BeritaController : ambilKontenBerita(ID_Berita)
+deactivate HalamanDaftarBerita
+activate BeritaController
+
+BeritaController -> berita : Mengambil seluruh konten berita saat ini (Langkah 4)
+activate berita
+return Data Konten Berita
+deactivate berita
+
+BeritaController -> HalamanFormEditBerita : Tampilkan halaman form edit (Langkah 4)
+deactivate BeritaController
+activate HalamanFormEditBerita
+
+Admin -> HalamanFormEditBerita : Melakukan perubahan pada konten (Langkah 5)
+
+Admin -> HalamanFormEditBerita : Menekan tombol "Terbitkan" / "Perbarui" (Langkah 6)
+
+HalamanFormEditBerita -> BeritaController : ubahBerita(ID_Berita, Data Update)
+activate BeritaController
+
+BeritaController -> BeritaController : Validasi kelengkapan data (Langkah 7)
+
+alt Gagal Validasi (Alternative Flow 7.a)
+    BeritaController -> HalamanFormEditBerita : Tampilkan notifikasi("Pembaruan Gagal: Mohon perbaiki...") (Langkah 8.a)
+    deactivate BeritaController
+
+    HalamanFormEditBerita -> Admin : Menerima notifikasi gagal
+    
+    note over Admin, HalamanFormEditBerita
+        Memperbaiki data (Langkah 9.a)
+        Kembali ke Langkah 6 (Langkah 9.b)
+    end note
+else Validasi Sukses (Main Flow)
+    BeritaController -> berita : Memperbarui data berita di database (Langkah 8)
+    activate berita
+    return Status Update
+    deactivate berita
+
+    BeritaController -> HalamanDaftarBerita : Tampilkan notifikasi("Berita berhasil diperbarui") (Langkah 9)
+    BeritaController -> HalamanDaftarBerita : Muat ulang daftar berita Admin & Pembeli (Langkah 9)
+    deactivate BeritaController
+
+    HalamanFormEditBerita -> Admin : Menerima notifikasi sukses
+    deactivate HalamanFormEditBerita
+end alt
+
+@enduml

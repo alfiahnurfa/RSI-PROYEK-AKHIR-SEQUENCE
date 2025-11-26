@@ -1,0 +1,43 @@
+@startuml SD-UC-E01_MelihatDaftarPesanan
+title Sequence Diagram UC-E01: Melihat Daftar Seluruh Pesanan
+skinparam style strictuml
+
+actor Pembeli
+boundary HalamanTransaksi as "Halaman Transaksi Saya"
+control PesananController
+database pesanan as "pesanan\n(Database)"
+
+box "Sistem Riwayat Pesanan"
+    participant HalamanTransaksi
+    participant PesananController
+end box
+
+activate Pembeli
+Pengguna -> HalamanTransaksi : Mengakses halaman "Transaksi Saya" (Langkah 1)
+activate HalamanTransaksi
+
+HalamanTransaksi -> PesananController : ambilDaftarPesanan(ID_Pengguna)
+activate PesananController
+
+PesananController -> pesanan : Mengambil daftar ringkasan pesanan (Langkah 2)
+activate pesanan
+return List Ringkasan Pesanan / List Kosong (Langkah 2.a)
+deactivate pesanan
+
+alt Jika Riwayat Ditemukan (Main Flow)
+    PesananController -> HalamanTransaksi : Tampilkan daftar ringkasan pesanan (Langkah 3)
+    deactivate PesananController
+    
+    HalamanTransaksi -> Pembeli : Melihat daftar transaksi (Langkah 4)
+else Jika Riwayat Kosong (Alternative Flow 2.a)
+    note over PesananController
+        List Pesanan Kosong
+    end note
+    PesananController -> HalamanTransaksi : Tampilkan notifikasi("Anda belum memiliki riwayat transaksi.") (Langkah 3.a)
+    deactivate PesananController
+    
+    HalamanTransaksi -> Pembeli : Menerima notifikasi riwayat kosong (Langkah 4)
+end alt
+deactivate HalamanTransaksi
+
+@enduml

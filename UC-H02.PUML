@@ -1,0 +1,56 @@
+@startuml SD-UC-H02_TambahProduk
+title Sequence Diagram UC-H02: Menambahkan Produk Baru
+skinparam style strictuml
+
+actor Admin
+boundary HalamanTambahProduk
+control ProdukController
+database produk as "produk\n(Database)"
+
+box "Sistem Manajemen Produk"
+    participant HalamanTambahProduk
+    participant ProdukController
+end box
+
+activate Admin
+Admin -> HalamanTambahProduk : Mengakses halaman tambah produk (Langkah 1)
+activate HalamanTambahProduk
+
+HalamanTambahProduk -> Admin : Tampilkan formulir input produk (Langkah 1)
+
+Admin -> HalamanTambahProduk : Mengisi data produk lengkap (Langkah 2)
+
+Admin -> HalamanTambahProduk : Menekan tombol "Tambahkan" (Langkah 3)
+
+HalamanTambahProduk -> ProdukController : tambahProduk(Data Produk Baru)
+activate ProdukController
+
+UserController -> ProdukController : Validasi kelengkapan dan format data (Langkah 4)
+
+alt Gagal Validasi (Alternative Flow 4.a)
+    ProdukController -> HalamanTambahProduk : Tampilkan notifikasi("Penambahan Gagal...") (Langkah 5.a)
+    deactivate ProdukController
+    
+    HalamanTambahProduk -> Admin : Tampilkan notifikasi gagal
+    
+    note over Admin, HalamanTambahProduk
+        Melengkapi/memperbaiki data (Langkah 6.a)
+        Kembali ke Langkah 3 (Langkah 6.b)
+    end note
+else Validasi Sukses (Main Flow)
+    ProdukController -> produk : Simpan informasi produk baru (Status='Aktif') (Langkah 5.a)
+    activate produk
+    return ID_Produk_Baru
+    deactivate produk
+    
+    ProdukController -> HalamanTambahProduk : Tampilkan notifikasi("Produk berhasil ditambahkan") (Langkah 5.b)
+
+    ProdukController -> HalamanTambahProduk : Perbarui halaman katalog Pembeli (Langkah 6)
+    deactivate ProdukController
+    
+    HalamanTambahProduk -> Admin : Menerima notifikasi sukses
+end alt
+
+deactivate HalamanTambahProduk
+
+@enduml

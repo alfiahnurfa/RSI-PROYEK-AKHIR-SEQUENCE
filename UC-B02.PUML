@@ -1,0 +1,43 @@
+@startuml SD-UC-B02_MencariProduk
+title Sequence Diagram UC-B02: Mencari Produk
+skinparam style strictuml
+
+actor Pembeli
+boundary HalamanKatalog
+control ProdukController
+database produk as "produk\n(Database)"
+
+box "Sistem Pencarian"
+    participant HalamanKatalog
+    participant ProdukController
+end box
+
+activate Pembeli
+Pengguna -> HalamanKatalog : Memasukkan kata kunci (Langkah 1)
+activate HalamanKatalog
+
+Pengguna -> HalamanKatalog : Menekan tombol Cari (Langkah 2)
+
+HalamanKatalog -> ProdukController : cariProduk(kata_kunci)
+activate ProdukController
+
+ProdukController -> produk : Query database untuk mencocokkan kata kunci (Langkah 3)
+activate produk
+return List Produk Relevan / List Kosong
+
+alt Jika Produk Ditemukan (Main Flow 4)
+    ProdukController -> HalamanKatalog : Tampilkan hasil pencarian(List Produk Relevan)
+    deactivate ProdukController
+    
+    HalamanKatalog -> Pembeli : Melihat hasil pencarian produk (Langkah 5)
+else Jika Tidak Ditemukan (Alternative Flow 4.a)
+    ProdukController -> HalamanKatalog : Tampilkan notifikasi("Tidak ada produk yang sesuai...") (Langkah 4.b)
+    deactivate ProdukController
+    
+    HalamanKatalog -> Pembeli : Melihat notifikasi produk tidak ditemukan (Langkah 5)
+end alt
+
+deactivate HalamanKatalog
+deactivate produk
+
+@enduml

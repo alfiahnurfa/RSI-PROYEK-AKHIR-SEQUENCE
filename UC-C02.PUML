@@ -1,0 +1,53 @@
+@startuml SD-UC-C02_MelihatKeranjang
+title Sequence Diagram UC-C02: Melihat Daftar Keranjang Belanja
+skinparam style strictuml
+
+actor Pembeli
+boundary HalamanDashboard
+boundary HalamanKeranjang
+control KeranjangController
+database detail_pesanan as "detail_pesanan\n(Keranjang)"
+
+box "Sistem Transaksi"
+    participant HalamanDashboard
+    participant HalamanKeranjang
+    participant KeranjangController
+end box
+
+activate Pembeli
+Pengguna -> HalamanDashboard : Membuka dashboard website (Langkah 1)
+activate HalamanDashboard
+
+Pengguna -> HalamanDashboard : Menekan tombol "keranjang" di navbar (Langkah 2)
+deactivate HalamanDashboard
+
+HalamanKeranjang -> KeranjangController : ambilDetailPesanan(ID_Pengguna)
+activate KeranjangController
+
+KeranjangController -> detail_pesanan : Mengambil semua item keranjang (Langkah 3)
+activate detail_pesanan
+return List Item Keranjang / List Kosong (Langkah 3.a)
+
+alt Jika Item Ditemukan (Main Flow)
+    KeranjangController -> KeranjangController : Hitung subtotal keranjang (Langkah 4)
+    KeranjangController -> HalamanKeranjang : Tampilkan daftar lengkap produk (Langkah 4)
+    deactivate KeranjangController
+    activate HalamanKeranjang
+    
+    HalamanKeranjang -> Pembeli : Melihat daftar keranjang produk (Langkah 5)
+    deactivate HalamanKeranjang
+else Jika Keranjang Kosong (Alternative Flow 3.a)
+    note over KeranjangController
+        List item kosong
+    end note
+    KeranjangController -> HalamanKeranjang : Tampilkan notifikasi("Keranjang Belanja Anda Kosong") (Langkah 4.a)
+    deactivate KeranjangController
+    activate HalamanKeranjang
+    
+    HalamanKeranjang -> Pembeli : Melihat notifikasi keranjang kosong (Langkah 5)
+    deactivate HalamanKeranjang
+end alt
+
+deactivate detail_pesanan
+
+@enduml

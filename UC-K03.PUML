@@ -1,0 +1,53 @@
+@startuml SD-UC-K03_HapusBerita
+title Sequence Diagram UC-K03: Menghapus Berita (Admin)
+skinparam style strictuml
+
+actor Admin
+boundary HalamanDaftarBerita
+control BeritaController
+database berita as "berita\n(Database)"
+
+box "Sistem Manajemen Berita"
+    participant HalamanDaftarBerita
+    participant BeritaController
+end box
+
+activate Admin
+Admin -> HalamanDaftarBerita : Mengakses halaman daftar berita (Langkah 1)
+activate HalamanDaftarBerita
+
+HalamanDaftarBerita -> Admin : Tampilkan daftar berita yang diterbitkan (Langkah 1 & 2)
+
+Admin -> HalamanDaftarBerita : Menekan tombol "Hapus" (Langkah 3)
+HalamanDaftarBerita -> HalamanDaftarBerita : Tampilkan kotak dialog konfirmasi (Langkah 4)
+
+Admin -> HalamanDaftarBerita : Memilih "Ya, Hapus" / "Batal" (Langkah 5 / 5.a)
+
+alt Jika Admin Memilih "Ya, Hapus" (Main Flow)
+    HalamanDaftarBerita -> BeritaController : hapusBerita(ID_Berita)
+    activate BeritaController
+    
+    BeritaController -> berita : Memproses perintah hapus permanen (Langkah 6)
+    activate berita
+    return Status Operasi
+    deactivate berita
+    
+    BeritaController -> HalamanDaftarBerita : Tampilkan notifikasi("Berita berhasil dihapus") (Langkah 7)
+    
+    BeritaController -> HalamanDaftarBerita : Perbarui daftar berita (Langkah 8)
+    deactivate BeritaController
+    
+    HalamanDaftarBerita -> Admin : Menerima notifikasi sukses dan daftar terbaru
+else Jika Admin Memilih "Batal" (Alternative Flow 5.a)
+    HalamanDaftarBerita -> BeritaController : batalkanPenghapusan()
+    activate BeritaController
+    
+    BeritaController -> HalamanDaftarBerita : Berikan notifikasi("Penghapusan dibatalkan.") (Langkah 6.a)
+    deactivate BeritaController
+    
+    HalamanDaftarBerita -> Admin : Menerima notifikasi pembatalan
+end alt
+
+deactivate HalamanDaftarBerita
+
+@enduml

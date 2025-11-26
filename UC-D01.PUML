@@ -1,0 +1,94 @@
+@startuml SD-UC-D01_MelakukanPembayaran
+title Sequence Diagram UC-D01: Menginisiasi Checkout & Menyelesaikan Pembayaran
+skinparam style strictuml
+
+actor Pembeli
+boundary HalamanCheckout
+boundary HalamanPembayaran
+control PesananController
+control PembayaranController
+database pesanan as "pesanan\n(Status)"
+database pembayaran as "pembayaran\n(Transaksi)"
+participant SistemEksternal as "Aplikasi Pembayaran"
+
+box "Sistem Transaksi & Pembayaran"
+    participant HalamanCheckout
+    participant HalamanPembayaran
+    participant PesananController
+    participant PembayaranController
+end box
+
+activate Pembeli
+
+alt Inisiasi Pesanan (Langkah 1)
+    Pembeli -> HalamanCheckout : Klik "Beli" (dari keranjang) / "Beli Langsung" (dari katalog)
+else
+    note over Pembeli
+        Asumsi proses inisiasi (membuat entri pesanan) terjadi di sini
+    end note
+end
+activate HalamanCheckout
+
+HalamanCheckout -> PesananController : buatPesanan()
+activate PesananController
+PesananController -> pesanan : Buat entri Pesanan baru
+activate pesanan
+return ID_Pesanan
+deactivate pesanan
+
+PesananController -> HalamanCheckout : Arahkan ke rincian pesanan
+deactivate PesananController
+
+HalamanCheckout -> Pembeli : Tampilkan rincian pesanan (Langkah 2)
+
+Pembeli -> HalamanCheckout : Klik "Bayar Sekarang" (Langkah 3)
+
+HalamanCheckout -> PembayaranController : inisiasiPembayaran(ID_Pesanan)
+activate PembayaranController
+PembayaranController -> pembayaran : Buat entri Pembayaran (Status: Menunggu Pembayaran)
+activate pembayaran
+return ID_Pembayaran
+deactivate pembayaran
+
+PembayaranController -> HalamanPembayaran : Tampilkan QR Pembayaran (Langkah 3)
+deactivate PembayaranController
+activate HalamanPembayaran
+
+group Alur Pembayaran
+    alt Pembayaran Dibatalkan Otomatis (Alternative Flow 3.a, 5.a, 6.a, 7.a)
+        Sistem -> pembayaran : Catat Waktu Kedaluwarsa (Langkah 3.a)
+        Sistem -> pembayaran : Cek Batas Waktu Habis (Langkah 5.a)
+        
+        note over Sistem, Pembeli
+            Jika batas waktu terlewati
+        end note
+
+        pembayaran -> pesanan : Update Status='Dibatalkan Otomatis' (Langkah 6.a)
+        HalamanPembayaran -> Pembeli : Tampilkan notifikasi pembatalan (Langkah 7.a)
+    else Pembayaran Sukses (Main Flow 4-9)
+        Pembeli -> SistemEksternal : Memindai QR & Melakukan pembayaran (Langkah 4, 5)
+        
+        Pembeli -> HalamanPembayaran : Klik "Konfirmasi Pembayaran" (Langkah 6)
+        HalamanPembayaran -> PembayaranController : konfirmasiPembayaran(ID_Pembayaran)
+        activate PembayaranController
+
+        PembayaranController -> PembayaranController : Verifikasi dengan Payment Gateway (Langkah 7)
+        
+        PembayaranController -> pembayaran : Update Status='Selesai' (Langkah 8.a)
+        PembayaranController -> pesanan : Update Status='Diproses/Dikemas' (Langkah 8.b)
+
+        PembayaranController -> HalamanPembayaran : Tampilkan notifikasi("Pembayaran Selesai") (Langkah 9)
+        deactivate PembayaranController
+
+        HalamanPembayaran -> Pembeli : Menerima notifikasi sukses (Langkah 9)
+    end alt
+end
+
+deactivate HalamanPembayaran
+deactivate Pembeli
+deactivate HalamanCheckout
+deactivate pesanan
+deactivate pembayaran
+deactivate SistemEksternal
+
+@enduml
