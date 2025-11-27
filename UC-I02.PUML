@@ -20,8 +20,7 @@ activate HalamanPesananAdmin
 HalamanPesananAdmin -> Admin : Tampilkan daftar pesanan yang perlu ditindaklanjuti (Langkah 1 & 2)
 
 ' Admin -> HalamanPesananAdmin : Memilih pesanan & menekan tombol "Beri Aksi" (Langkah 2 & 3)
-' HalamanPesananAdmin -> Ha
-lamanPesananAdmin : Buka akses pengisian Status Pesanan (Langkah 3)
+' HalamanPesananAdmin -> HalamanPesananAdmin : Buka akses pengisian Status Pesanan (Langkah 3)
 
 Admin -> HalamanPesananAdmin : Memilih Status Baru (Langkah 4)
 

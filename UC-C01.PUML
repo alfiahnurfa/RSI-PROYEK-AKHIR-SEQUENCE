@@ -5,7 +5,7 @@ skinparam style strictuml
 actor Pembeli
 boundary HalamanDetailProduk
 control KeranjangController
-database produk as "produk\n(Database)"
+entity produk
 entity detail_pesanan
 ' box "Sistem Transaksi"
 '     participant HalamanDetailProduk
