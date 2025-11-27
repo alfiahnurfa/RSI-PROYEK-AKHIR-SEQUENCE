@@ -7,66 +7,8 @@ left to right direction
 '------------------------------------------------------------------
 ' AKTOR
 '------------------------------------------------------------------
-actor Pembeli as "Pembeli"
+actor Pembeli
 actor Admin
-
-'------------------------------------------------------------------
-' SISTEM BOUNDARY
-'------------------------------------------------------------------
-' rectangle "Sistem Informasi" {
-
-'     ' KELOMPOK USE CASE PEMBELI
-'     package "Aktivitas Akun" {
-'         (UC-A01 Mendaftar Akun)
-'         (UC-A02 Masuk ke Akun Pengguna)
-'         (UC-A03 Memperbarui Data Profil)
-'         (UC-A04 Mengubah Kata Sandi)
-'     }
-
-'     package "Katalog & Keranjang" {
-'         (UC-B01 Melihat Seluruh Katalog Produk)
-'         (UC-B02 Mencari Produk)
-'         (UC-B03 Memfilter Produk)
-'         (UC-B04 Melihat Detail Produk)
-'         (UC-C01 Menambahkan Produk ke Keranjang)
-'         (UC-C02 Melihat Keranjang Belanja)
-'         (UC-C03 Menghapus Produk Keranjang)
-'         (UC-C04 Mengubah Kuantitas Produk Keranjang)
-'     }
-
-'     package "Transaksi & Pengaduan" {
-'         (UC-D01 Melakukan Pembayaran)
-'         (UC-E01 Melihat Daftar Seluruh Pesanan)
-'         (UC-E02 Melihat Detail Pesanan)
-'         (UC-F01 Mengirim Laporan Pengaduan Produk)
-'     }
-
-'     package "Informasi Publik" {
-'         (UC-G01 Membaca Berita)
-'     }
-
-'     ' KELOMPOK USE CASE ADMIN
-'     package "Manajemen Produk" {
-'         (UC-H01 Melihat Daftar Produk)
-'         (UC-H02 Menambahkan Produk)
-'         (UC-H03 Menghapus Produk)
-'         (UC-H04 Mengarsipkan Produk)
-'         (UC-H05 Memperbarui Stok Produk)
-'     }
-
-'     package "Manajemen Pesanan" {
-'         (UC-I01 Melihat Daftar Pesanan)
-'         (UC-I02 Memperbarui Status Pesanan)
-'     }
-    
-'     package "Pusat & Manajemen Berita" {
-'         (UC-J01 Melihat Komplain Produk)
-'         (UC-K01 Melihat Daftar Berita)
-'         (UC-K02 Menambahkan Berita)
-'         (UC-K03 Menghapus Berita)
-'         (UC-K04 Memperbarui Berita)
-'     }
-' }
 
 '------------------------------------------------------------------
 ' RELASI PEMBELI
