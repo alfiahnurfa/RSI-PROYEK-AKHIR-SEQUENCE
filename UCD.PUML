@@ -39,6 +39,7 @@ Pembeli --> (UC-G01 Membaca Berita)
 ' RELASI ADMIN
 '------------------------------------------------------------------
 (UC-A02 Masuk ke Akun Pengguna) <-- Admin
+' Admin --> (UC-A02 Masuk ke Akun Pengguna as admin)
 Admin --> (UC-H01 Melihat Daftar Produk)
 Admin --> (UC-H02 Menambahkan Produk)
 Admin --> (UC-H03 Menghapus Produk)
