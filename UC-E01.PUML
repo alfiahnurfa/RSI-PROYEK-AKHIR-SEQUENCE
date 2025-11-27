@@ -5,7 +5,7 @@ skinparam style strictuml
 actor Pembeli
 boundary HalamanTransaksi as "Halaman Transaksi Saya"
 control PesananController
-database pesanan as "pesanan\n(Database)"
+entity pesanan
 
 ' box "Sistem Riwayat Pesanan"
 '     participant HalamanTransaksi

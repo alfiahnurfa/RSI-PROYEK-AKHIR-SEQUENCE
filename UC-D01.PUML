@@ -7,8 +7,8 @@ boundary HalamanCheckout
 boundary HalamanPembayaran
 control PesananController
 control PembayaranController
-database pesanan as "pesanan\n(Status)"
-database pembayaran as "pembayaran\n(Transaksi)"
+entity pesanan
+entity pembayaran
 participant SistemEksternal as "Aplikasi Pembayaran"
 
 ' box "Sistem Transaksi & Pembayaran"

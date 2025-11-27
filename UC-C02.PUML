@@ -6,8 +6,7 @@ actor Pembeli
 boundary HalamanDashboard
 boundary HalamanKeranjang
 control KeranjangController
-database detail_pesanan as "detail_pesanan\n(Keranjang)"
-
+entity detail_pesanan
 ' box "Sistem Transaksi"
 '     participant HalamanDashboard
 '     participant HalamanKeranjang

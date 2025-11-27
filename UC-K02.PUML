@@ -6,7 +6,7 @@ actor Admin
 boundary HalamanDaftarBerita
 boundary HalamanFormBerita
 control BeritaController
-database berita as "berita\n(Database)"
+entity berita
 
 ' box "Sistem Manajemen Berita"
 '     participant HalamanDaftarBerita

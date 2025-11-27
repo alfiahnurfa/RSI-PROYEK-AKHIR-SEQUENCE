@@ -5,8 +5,7 @@ skinparam style strictuml
 actor Pembeli
 boundary HalamanKatalog
 control ProdukController
-database produk as "produk\n(Database)"
-
+entity produk
 ' box "Sistem Katalog"
 '     participant HalamanKatalog
 '     participant ProdukController

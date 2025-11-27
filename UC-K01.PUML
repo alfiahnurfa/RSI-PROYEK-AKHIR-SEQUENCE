@@ -5,7 +5,7 @@ skinparam style strictuml
 actor Admin
 boundary HalamanDaftarBerita
 control BeritaController
-database berita as "berita\n(Database)"
+entity berita
 
 ' box "Sistem Manajemen Berita"
 '     participant HalamanDaftarBerita

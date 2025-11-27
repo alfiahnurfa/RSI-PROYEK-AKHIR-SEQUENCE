@@ -6,7 +6,7 @@ actor Admin
 boundary HalamanKelolaProduk
 control ProdukController
 control PesananController
-database produk as "produk\n(Database)"
+entity produk
 
 ' box "Sistem Manajemen Produk"
 '     participant HalamanKelolaProduk

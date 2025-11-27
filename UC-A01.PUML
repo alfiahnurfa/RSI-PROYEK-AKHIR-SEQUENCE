@@ -5,8 +5,7 @@ skinparam style strictuml
 actor Pengguna
 boundary HalamanRegister
 control UserController
-database user as "user\n(Database)"
-
+entity user
 ' box "Sistem Pendaftaran"
 '     participant HalamanRegister
 '     participant UserController

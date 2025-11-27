@@ -5,8 +5,7 @@ skinparam style strictuml
 actor Admin
 boundary HalamanDaftarPesanan
 control PesananController
-database pesanan as "pesanan\n(Database)"
-
+entity pesanan
 ' box "Sistem Manajemen Pesanan"
 '     participant HalamanDaftarPesanan
 '     participant PesananController

@@ -5,7 +5,7 @@ skinparam style strictuml
 actor Pembeli
 boundary HalamanDetailPesanan
 control KomplainController
-database komplain as "komplain\n(Database)"
+entity komplain
 ' participant Admin as "Admin\n(Sistem Penerima)"
 
 ' box "Sistem Pengaduan"

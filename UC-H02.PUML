@@ -5,8 +5,7 @@ skinparam style strictuml
 actor Admin
 boundary HalamanTambahProduk
 control ProdukController
-database produk as "produk\n(Database)"
-
+entity produk
 ' box "Sistem Manajemen Produk"
 '     participant HalamanTambahProduk
 '     participant ProdukController

@@ -7,7 +7,7 @@ boundary HalamanDashboard
 boundary HalamanDaftarBerita
 boundary HalamanDetailBerita
 control BeritaController
-database berita as "berita\n(Database)"
+entity berita
 
 ' box "Sistem Informasi Berita"
 '     participant HalamanDashboard
