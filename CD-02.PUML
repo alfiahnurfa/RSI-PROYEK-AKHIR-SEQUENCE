@@ -5,8 +5,7 @@ skinparam ClassAttributeIconStyle none
 ' Kelas Model (Tanpa Metode)
 ' ---------------------------------
 class User {
-  + id_pengguna : int <<PK>>
-  --
+  + id_pengguna
   + nama : string
   + email : string
   - password : string
@@ -17,8 +16,7 @@ class User {
 }
 
 class Produk {
-  + id_produk : int <<PK>>
-  --
+  + id_produk : Produk 
   + nama_produk : string
   + kategori_produk : string
   + deskripsi_produk : string
@@ -30,27 +28,24 @@ class Produk {
 }
 
 class Pesanan {
-  + id_pesanan : int <<PK>>
-  --
-  + id_pembeli : int <<FK>>
+  + id_pesanan : Pesanan 
+  + id_pembeli : User 
   + alamat_pengiriman : string
   + status_pemesanan : string
   + waktu_pemesanan : DateTime
 }
 
 class DetailPesanan {
-  + id_detail_pesanan : int <<PK>>
-  --
-  + id_pesanan : int <<FK>>
-  + id_produk : int <<FK>>
+  + id_detail_pesanan : DetailPesanan 
+  + id_pesanan : Pesanan 
+  + id_produk : Produk 
   + kuantitas_produk : int
   + harga_produk_tersimpan : float
 }
 
 class Komplain {
-  + id_komplain : int <<PK>>
-  --
-  + id_pesanan : int <<FK>>
+  + id_komplain : Komplain 
+  + id_pesanan : Pesanan 
   + judul_komplain : string
   + deskripsi_komplain : string
   + bukti_komplain : string
@@ -59,9 +54,8 @@ class Komplain {
 }
 
 class Berita {
-  + id_berita : int <<PK>>
-  --
-  + id_penulis : int <<FK>>
+  + id_berita : Berita 
+  + id_penulis : User
   + judul_berita : string
   + isi_berita : text
   + gambar_berita : string
