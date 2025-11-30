@@ -5,41 +5,25 @@ skinparam style strictuml
 actor Pembeli
 boundary HalamanTransaksi as "Halaman Transaksi Saya"
 control PesananController
-entity pesanan
-
-' box "Sistem Riwayat Pesanan"
-'     participant HalamanTransaksi
-'     participant PesananController
-' end box
+entity Pesanan
 
 activate Pembeli
-Pembeli -> HalamanTransaksi : Mengakses halaman "Transaksi Saya" (Langkah 1)
+Pembeli -> HalamanTransaksi : Mengakses halaman "/dashboard/transaksi"
 activate HalamanTransaksi
 
-HalamanTransaksi -> PesananController : ambilDaftarPesanan(ID_Pengguna)
+HalamanTransaksi -> PesananController : GET /pesanan
 activate PesananController
 
-PesananController -> pesanan : Mengambil daftar ringkasan pesanan (Langkah 2)
-activate pesanan
-return List Ringkasan Pesanan / List Kosong (Langkah 2.a)
-deactivate pesanan
+PesananController -> Pesanan : findByUserId(auth_id)
+activate Pesanan
+Pesanan --> PesananController : List Ringkasan Pesanan: List<Pesanan>
+deactivate Pesanan
 
-PesananController -> HalamanTransaksi : Tampilkan daftar ringkasan pesanan (Langkah 3)
+PesananController --> HalamanTransaksi : response(List Pesanan)
 deactivate PesananController
 
-HalamanTransaksi -> Pembeli : Melihat daftar transaksi (Langkah 4)
-
-' alt Jika Riwayat Ditemukan (Main Flow)
-
-' else Jika Riwayat Kosong (Alternative Flow 2.a)
-'     note over PesananController
-'         List Pesanan Kosong
-'     end note
-'     PesananController -> HalamanTransaksi : Tampilkan notifikasi("Anda belum memiliki riwayat transaksi.") (Langkah 3.a)
-'     deactivate PesananController
-    
-'     HalamanTransaksi -> Pembeli : Menerima notifikasi riwayat kosong (Langkah 4)
-' end alt
+HalamanTransaksi -> Pembeli : Tampilkan daftar ringkasan pesanan
 deactivate HalamanTransaksi
+deactivate Pembeli
 
 @enduml

@@ -5,54 +5,40 @@ skinparam style strictuml
 actor Pengguna
 boundary HalamanLogin
 control UserController
-entity user
-
-' box "Sistem Otentikasi"
-'     participant HalamanLogin
-'     participant UserController
-' end box
+entity User
 
 activate Pengguna
-Pengguna -> HalamanLogin : Mengakses halaman Login (Langkah 1)
+Pengguna -> HalamanLogin : Mengakses halaman Login
 activate HalamanLogin
 
 HalamanLogin -> Pengguna : Tampilkan formulir login
 
-Pengguna -> HalamanLogin : Mengisi email dan password (Langkah 2)
+Pengguna -> HalamanLogin : Input(email, password)
 
-Pengguna -> HalamanLogin : Menekan tombol "Masuk" (Langkah 3)
+Pengguna -> HalamanLogin : Klik "Masuk"
 
-HalamanLogin -> UserController : masuk(email, password)
+HalamanLogin -> UserController : login(request: LoginRequest)
 activate UserController
 
-UserController -> user : Cari data pengguna (berdasarkan email)
-activate user
-return DataPenggunaTersimpan
+UserController -> User : validate(request.data)
+activate User
 
-UserController -> user : Verifikasi Password (Data input vs Hash tersimpan) (Langkah 4)
+UserController -> User : findByCredentials(email)
 
-    UserController -> user : Buat sesi login baru (Langkah 5)
-    
-    UserController -> HalamanLogin : Tampilkan notifikasi("Login Berhasil") (Langkah 6)
-    deactivate UserController
-    
-    HalamanLogin -> Pengguna : Arahkan ke Halaman Utama (Langkah 6, 7)
-    deactivate HalamanLogin
 
-' alt Jika Verifikasi Gagal (Alternative Flow 4.a)
-'     UserController -> HalamanLogin : Tampilkan notifikasi("Login Gagal, Email/Password Salah.") (Langkah 4.b)
-'     deactivate UserController
-    
-'     HalamanLogin -> Pengguna : Tampilkan notifikasi gagal
-    
-'     note over Pengguna, HalamanLogin
-'         Memperbaiki kredensial atau opsi Lupa Password (Langkah 4.c)
-'         Kembali ke Langkah 2 (Langkah 4.d)
-'     end note
-' else Jika Verifikasi Berhasil (Main Flow)
+UserController -> User : verifyPassword(password, UserData.hash)
 
-' end alt
+UserController -> User : createToken(UserData.id)
 
-deactivate user
+User --> UserController : UserData: User
+
+deactivate User
+
+UserController --> HalamanLogin : AuthResponse (token, user)
+deactivate UserController
+
+HalamanLogin -> Pengguna : Redirect ke '/dashboard'
+deactivate HalamanLogin
+deactivate Pengguna
 
 @enduml

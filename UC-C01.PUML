@@ -4,57 +4,36 @@ skinparam style strictuml
 
 actor Pembeli
 boundary HalamanDetailProduk
-control KeranjangController
-entity produk
-entity detail_pesanan
-' box "Sistem Transaksi"
-'     participant HalamanDetailProduk
-'     participant KeranjangController
-' end box
+control CartController
+entity ProductModel
+entity DetailPesanan
 
 activate Pembeli
-Pembeli -> HalamanDetailProduk : Membuka detail katalog produk (Langkah 1)
+Pembeli -> HalamanDetailProduk : Mengakses Detail Produk
 activate HalamanDetailProduk
 
-Pembeli -> HalamanDetailProduk : Memasukkan jumlah produk (Langkah 2)
+Pembeli -> HalamanDetailProduk : Input(quantity: integer)
 
-Pembeli -> HalamanDetailProduk : Menekan tombol "Simpan keranjang" (Langkah 3)
+Pembeli -> HalamanDetailProduk : Klik "Tambah ke Keranjang"
 
-HalamanDetailProduk -> KeranjangController : tambahItemKeranjang(ID_Produk, Kuantitas)
-activate KeranjangController
+HalamanDetailProduk -> CartController : POST /cart/add (request: object)
+activate CartController
 
-KeranjangController -> produk : Verifikasi ketersediaan stok & status (Langkah 4)
-activate produk
-return Status Stok & Harga Saat Ini
+CartController -> ProductModel : checkStockAndPrice(request.product_id, request.quantity)
+activate ProductModel
+ProductModel --> CartController : {price: number, stock_ok: boolean}
+deactivate ProductModel
 
-KeranjangController -> detail_pesanan : Perbarui/Simpan item baru (ID_Produk, Kuantitas, Harga) (Langkah 5)
-activate detail_pesanan
-return Status Simpan
-deactivate detail_pesanan
+CartController -> DetailPesanan : upsertItem(user.id, product_id, quantity, price)
+activate DetailPesanan
+DetailPesanan --> CartController : StatusPersistence: boolean
+deactivate DetailPesanan
 
-KeranjangController -> HalamanDetailProduk : Tampilkan notifikasi("Produk berhasil ditambahkan...") (Langkah 6)
-deactivate KeranjangController
+CartController --> HalamanDetailProduk : responseSuccess(message: string)
+deactivate CartController
 
-HalamanDetailProduk -> Pembeli : Menerima notifikasi sukses
-
-' alt Stok Tidak Mencukupi (Alternative Flow 4.a)
-'     note over KeranjangController
-'         Kuantitas diminta > Stok Tersedia
-'     end note
-'     KeranjangController -> HalamanDetailProduk : Tampilkan notifikasi("Gagal: Stok Produk Tidak Mencukupi") (Langkah 4.b)
-'     deactivate KeranjangController
-    
-'     HalamanDetailProduk -> Pembeli : Menerima notifikasi gagal
-    
-'     note over Pembeli, HalamanDetailProduk
-'         Mengubah jumlah produk (Langkah 4.c)
-'         Kembali ke Langkah 2 (Langkah 4.d)
-'     end note
-' else Stok Mencukupi (Main Flow)
-
-' end alt
-
+HalamanDetailProduk -> Pembeli : Tampilkan notifikasi sukses
 deactivate HalamanDetailProduk
-deactivate produk
+deactivate Pembeli
 
 @enduml

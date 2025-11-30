@@ -5,60 +5,31 @@ skinparam style strictuml
 actor Admin
 boundary HalamanPesananAdmin
 control PesananController
-entity pesanan
-' participant Notifikasi as "Sistem Notifikasi"
-
-' box "Sistem Manajemen Pesanan"
-'     participant HalamanPesananAdmin
-'     participant PesananController
-' end box
+entity Pesanan
 
 activate Admin
-Admin -> HalamanPesananAdmin : Mengakses halaman pesanan produk (Langkah 1)
+Admin -> HalamanPesananAdmin : Mengakses halaman "/admin/pesanan"
 activate HalamanPesananAdmin
 
-HalamanPesananAdmin -> Admin : Tampilkan daftar pesanan yang perlu ditindaklanjuti (Langkah 1 & 2)
+HalamanPesananAdmin -> Admin : Tampilkan daftar pesanan
 
-' Admin -> HalamanPesananAdmin : Memilih pesanan & menekan tombol "Beri Aksi" (Langkah 2 & 3)
-' HalamanPesananAdmin -> HalamanPesananAdmin : Buka akses pengisian Status Pesanan (Langkah 3)
+Admin -> HalamanPesananAdmin : Pilih dan Simpan Status Baru (status: string)
 
-Admin -> HalamanPesananAdmin : Memilih Status Baru (Langkah 4)
-
-Admin -> HalamanPesananAdmin : Menekan tombol “Simpan” (Langkah 5)
-
-HalamanPesananAdmin -> PesananController : perbaruiStatusPesanan(ID_Pesanan, Status_Baru)
+HalamanPesananAdmin -> PesananController : PATCH /admin/pesanan/{ID_Pesanan} (request: object)
 activate PesananController
 
-PesananController -> pesanan : Validasi perubahan status (Langkah 6)
+PesananController -> Pesanan : validate(request.data)
+activate Pesanan
 
-PesananController -> pesanan : Memperbarui status_pesanan di database (Langkah 6)
-activate pesanan
-return Status Update
-deactivate pesanan
-PesananController -> HalamanPesananAdmin : Tampilkan notifikasi("Status pesanan berhasil diperbarui") (Langkah 7)
-    
-' PesananController -> Notifikasi : Memicu notifikasi status baru kepada Pembeli (Langkah 8)
-' activate Notifikasi
-' deactivate Notifikasi
+PesananController -> Pesanan : updateStatus(ID_Pesanan, request.status)
+Pesanan --> PesananController : updateStatus: boolean
+deactivate Pesanan
+
+PesananController --> HalamanPesananAdmin : responseSuccess(message: string)
 deactivate PesananController
 
-HalamanPesananAdmin -> Admin : Menerima notifikasi sukses
-
-' alt Proses Pembaruan Gagal (Alternative Flow 6.a)
-'     note over PesananController
-'         Contoh: Melompat status secara tidak sah
-'     end note
-'     PesananController -> HalamanPesananAdmin : Tampilkan notifikasi("Pembaruan Status Gagal.") (Langkah 7.a)
-'     deactivate PesananController
-    
-'     HalamanPesananAdmin -> Admin : Menerima notifikasi gagal
-    
-'     note over Admin, HalamanPesananAdmin
-'         Kembali ke Langkah 4 (Langkah 8.a)
-'     end note
-' else Proses Pembaruan Sukses (Main Flow)
-
-' end alt
+HalamanPesananAdmin -> Admin : Tampilkan notifikasi sukses dan muat ulang daftar
 deactivate HalamanPesananAdmin
+deactivate Admin
 
 @enduml

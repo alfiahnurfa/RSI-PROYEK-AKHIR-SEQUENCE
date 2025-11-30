@@ -5,41 +5,25 @@ skinparam style strictuml
 actor Admin
 boundary HalamanDaftarBerita
 control BeritaController
-entity berita
-
-' box "Sistem Manajemen Berita"
-'     participant HalamanDaftarBerita
-'     participant BeritaController
-' end box
+entity Berita
 
 activate Admin
-Admin -> HalamanDaftarBerita : Mengakses menu "Berita" (Langkah 1)
+Admin -> HalamanDaftarBerita : Mengakses halaman "/admin/berita"
 activate HalamanDaftarBerita
 
-HalamanDaftarBerita -> BeritaController : ambilSemuaBeritaAdmin()
+HalamanDaftarBerita -> BeritaController : GET /admin/berita
 activate BeritaController
 
-BeritaController -> berita : Mengambil daftar seluruh berita (Draft & Terbit) (Langkah 2)
-activate berita
-return List Berita Lengkap / List Kosong (Langkah 2.a)
-deactivate berita
+BeritaController -> Berita : findAll()
+activate Berita
+Berita --> BeritaController : List Berita Lengkap: List<Berita>
+deactivate Berita
 
-BeritaController -> HalamanDaftarBerita : Tampilkan daftar berita lengkap (Langkah 3)
+BeritaController --> HalamanDaftarBerita : response(List Berita Lengkap)
 deactivate BeritaController
     
-HalamanDaftarBerita -> Admin : Melihat dan meninjau daftar berita (Langkah 4)
-
-' alt Jika Berita Ditemukan (Main Flow)
-
-' else Jika Daftar Kosong (Alternative Flow 2.a)
-'     note over BeritaController
-'         List Berita Kosong
-'     end note
-'     BeritaController -> HalamanDaftarBerita : Tampilkan notifikasi("Belum ada berita yang ditambahkan.") (Langkah 3.a)
-'     deactivate BeritaController
-    
-'     HalamanDaftarBerita -> Admin : Menerima notifikasi daftar kosong (Langkah 4)
-' end alt
+HalamanDaftarBerita -> Admin : Melihat dan meninjau daftar berita
 deactivate HalamanDaftarBerita
+deactivate Admin
 
 @enduml

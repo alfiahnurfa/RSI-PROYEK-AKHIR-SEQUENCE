@@ -5,51 +5,29 @@ skinparam style strictuml
 actor Admin
 boundary HalamanDaftarBerita
 control BeritaController
-entity berita
-
-' box "Sistem Manajemen Berita"
-'     participant HalamanDaftarBerita
-'     participant BeritaController
-' end box
+entity Berita
 
 activate Admin
-Admin -> HalamanDaftarBerita : Mengakses halaman daftar berita (Langkah 1)
+Admin -> HalamanDaftarBerita : Mengakses halaman "/admin/berita"
 activate HalamanDaftarBerita
 
-HalamanDaftarBerita -> Admin : Tampilkan daftar berita yang diterbitkan (Langkah 1 & 2)
+HalamanDaftarBerita -> Admin : Tampilkan daftar berita
 
-Admin -> HalamanDaftarBerita : Menekan tombol "Hapus" (Langkah 3)
-HalamanDaftarBerita -> BeritaController : Tampilkan kotak dialog konfirmasi (Langkah 4)
+Admin -> HalamanDaftarBerita : Klik "Hapus" (ID_Berita: integer)
 
-Admin -> HalamanDaftarBerita : Memilih "Ya, Hapus" (Langkah 5 / 5.a)
-
-HalamanDaftarBerita -> BeritaController : hapusBerita(ID_Berita)
+HalamanDaftarBerita -> BeritaController : DELETE /admin/berita/{ID_Berita}
 activate BeritaController
     
-BeritaController -> berita : Memproses perintah hapus permanen (Langkah 6)
-activate berita
-return Status Operasi
-deactivate berita
+BeritaController -> Berita : deleteById(ID_Berita: integer)
+activate Berita
+Berita --> BeritaController : deleteStatus: boolean
+deactivate Berita
     
-BeritaController -> HalamanDaftarBerita : Tampilkan notifikasi("Berita berhasil dihapus") (Langkah 7)
-    
-BeritaController -> HalamanDaftarBerita : Perbarui daftar berita (Langkah 8)
+BeritaController --> HalamanDaftarBerita : responseSuccess(message: string)
 deactivate BeritaController
     
-HalamanDaftarBerita -> Admin : Menerima notifikasi sukses dan daftar terbaru
-
-' alt Jika Admin Memilih "Ya, Hapus" (Main Flow)
-
-' else Jika Admin Memilih "Batal" (Alternative Flow 5.a)
-'     HalamanDaftarBerita -> BeritaController : batalkanPenghapusan()
-'     activate BeritaController
-    
-'     BeritaController -> HalamanDaftarBerita : Berikan notifikasi("Penghapusan dibatalkan.") (Langkah 6.a)
-'     deactivate BeritaController
-    
-'     HalamanDaftarBerita -> Admin : Menerima notifikasi pembatalan
-' end alt
-
+HalamanDaftarBerita -> Admin : Tampilkan notifikasi sukses dan daftar terbaru
 deactivate HalamanDaftarBerita
+deactivate Admin
 
 @enduml

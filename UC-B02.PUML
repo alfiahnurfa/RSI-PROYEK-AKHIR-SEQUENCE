@@ -5,39 +5,27 @@ skinparam style strictuml
 actor Pembeli
 boundary HalamanKatalog
 control ProdukController
-entity produk
-' box "Sistem Pencarian"
-'     participant HalamanKatalog
-'     participant ProdukController
-' end box
+entity Produk
 
 activate Pembeli
-Pembeli -> HalamanKatalog : Memasukkan kata kunci (Langkah 1)
+Pembeli -> HalamanKatalog : Input(keyword: string)
 activate HalamanKatalog
 
-Pembeli -> HalamanKatalog : Menekan tombol Cari (Langkah 2)
+Pembeli -> HalamanKatalog : Klik "Cari"
 
-HalamanKatalog -> ProdukController : cariProduk(kata_kunci)
+HalamanKatalog -> ProdukController : GET /produk?keyword={keyword}
 activate ProdukController
 
-ProdukController -> produk : Query database untuk mencocokkan kata kunci (Langkah 3)
-activate produk
-return List Produk Relevan / List Kosong
-ProdukController -> HalamanKatalog : Tampilkan hasil pencarian(List Produk Relevan)
+ProdukController -> Produk : searchByKeyword(keyword: string)
+activate Produk
+Produk --> ProdukController : ProductList: List<Produk>
+deactivate Produk
+
+ProdukController --> HalamanKatalog : response(ProductList)
 deactivate ProdukController
 
-HalamanKatalog -> Pembeli : Melihat hasil pencarian produk (Langkah 5)
-
-' alt Jika Produk Ditemukan (Main Flow 4)
-
-' else Jika Tidak Ditemukan (Alternative Flow 4.a)
-'     ProdukController -> HalamanKatalog : Tampilkan notifikasi("Tidak ada produk yang sesuai...") (Langkah 4.b)
-'     deactivate ProdukController
-    
-'     HalamanKatalog -> Pembeli : Melihat notifikasi produk tidak ditemukan (Langkah 5)
-' end alt
-
+HalamanKatalog -> Pembeli : Tampilkan hasil pencarian
 deactivate HalamanKatalog
-deactivate produk
+deactivate Pembeli
 
 @enduml

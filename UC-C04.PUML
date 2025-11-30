@@ -4,59 +4,35 @@ skinparam style strictuml
 
 actor Pembeli
 boundary HalamanKeranjang
-control KeranjangController
-entity produk
-entity detail_pesanan
-' box "Sistem Inventaris & Transaksi"
-'     participant HalamanKeranjang
-'     participant KeranjangController
-' end box
+control CartController
+entity ProductModel
+entity DetailPesanan
 
 activate Pembeli
-Pembeli -> HalamanKeranjang : Mengakses halaman Keranjang Belanja (Langkah 1)
+Pembeli -> HalamanKeranjang : Mengakses '/dashboard/keranjang'
 activate HalamanKeranjang
-HalamanKeranjang -> Pembeli : Tampilkan daftar produk dan kuantitas (Langkah 1)
+HalamanKeranjang -> Pembeli : Tampilkan daftar produk dan kuantitas
 
-Pembeli -> HalamanKeranjang : Menekan "+" / "-" atau mengedit kuantitas (Langkah 2)
+Pembeli -> HalamanKeranjang : Aksi(ID_Item, New_Quantity)
 
-HalamanKeranjang -> KeranjangController : perbaruiKuantitas(ID_Item, Kuantitas_Baru)
-activate KeranjangController
+HalamanKeranjang -> CartController : PATCH /cart/{item_id} (request: object)
+activate CartController
 
-KeranjangController -> produk : Verifikasi ketersediaan stok untuk Kuantitas_Baru (Langkah 3)
-activate produk
-return Status Stok
+CartController -> ProductModel : checkStock(ID_Item, New_Quantity)
+activate ProductModel
+ProductModel --> CartController : StockStatus: boolean
+deactivate ProductModel
 
-KeranjangController -> detail_pesanan : Perbarui nilai kuantitas (Langkah 4)
-activate detail_pesanan
+CartController -> DetailPesanan : updateQuantity(ID_Item, New_Quantity)
+activate DetailPesanan
+DetailPesanan --> CartController : UpdatedDetail: object
+deactivate DetailPesanan
 
-KeranjangController -> detail_pesanan : Hitung ulang subtotal
+CartController --> HalamanKeranjang : response(UpdatedCartData)
+deactivate CartController
 
-detail_pesanan --> KeranjangController : Status Update
-deactivate detail_pesanan
-
-KeranjangController -> HalamanKeranjang : Muat ulang daftar keranjang (Langkah 5)
-deactivate KeranjangController
-
-HalamanKeranjang -> Pembeli : Melihat kuantitas dan subtotal yang diperbarui (Langkah 6)
-    
-' alt Stok Tidak Mencukupi (Alternative Flow 3.a)
-'     note over KeranjangController
-'         Kuantitas baru > Stok tersedia
-'     end note
-'     KeranjangController -> HalamanKeranjang : Tampilkan notifikasi("Gagal: Stok Produk Tidak Mencukupi.") (Langkah 4.a)
-'     deactivate KeranjangController
-
-'     HalamanKeranjang -> Pembeli : Menerima notifikasi gagal (Langkah 5.a)
-    
-'     note over Pembeli, HalamanKeranjang
-'         Memperbaiki kuantitas (Langkah 5.a)
-'         Kembali ke Langkah 2 (Langkah 5.b)
-'     end note
-' else Stok Mencukupi (Main Flow)
-
-' end alt
-
+HalamanKeranjang -> Pembeli : Melihat kuantitas dan subtotal yang diperbarui
 deactivate HalamanKeranjang
-deactivate produk
+deactivate Pembeli
 
 @enduml

@@ -6,44 +6,28 @@ actor Pembeli
 boundary HalamanTransaksi as "Halaman Transaksi Saya"
 boundary HalamanDetailPesanan
 control PesananController
-entity pesanan
-
-' box "Sistem Riwayat Pesanan"
-'     participant HalamanTransaksi
-'     participant HalamanDetailPesanan
-'     participant PesananController
-' end box
+entity Pesanan
 
 activate Pembeli
-Pembeli -> HalamanTransaksi : Mengakses riwayat pesanan (Langkah 1 & 2)
+Pembeli -> HalamanTransaksi : Mengakses riwayat pesanan
 activate HalamanTransaksi
 
-Pembeli -> HalamanTransaksi : Mengklik ringkasan pesanan / "Lihat Detail" (Langkah 3)
-HalamanTransaksi -> PesananController : ambilDetailPesanan(ID_Pesanan)
+Pembeli -> HalamanTransaksi : Mengklik detail pesanan (ID_Pesanan: integer)
+HalamanTransaksi -> PesananController : GET /pesanan/{ID_Pesanan}
 deactivate HalamanTransaksi
 activate PesananController
 
-PesananController -> pesanan : Mengambil seluruh rincian pesanan (Langkah 4)
-activate pesanan
-return Data Pesanan Lengkap / Null (Langkah 4.a)
-deactivate pesanan
+PesananController -> Pesanan : findDetailById(ID_Pesanan)
+activate Pesanan
+Pesanan --> PesananController : Data Pesanan Lengkap: Pesanan
+deactivate Pesanan
 
-PesananController -> HalamanDetailPesanan : Tampilkan halaman Detail Pesanan(Data Lengkap) (Langkah 5)
+PesananController --> HalamanDetailPesanan : response(Data Pesanan Lengkap)
 deactivate PesananController
 activate HalamanDetailPesanan
 
-HalamanDetailPesanan -> Pembeli : Meninjau detail pesanan (Langkah 6)
+HalamanDetailPesanan -> Pembeli : Meninjau detail pesanan
 deactivate HalamanDetailPesanan
-
-' alt Jika Pesanan Ditemukan (Main Flow)
-
-' else Jika Pesanan Tidak Ditemukan (Alternative Flow 4.a)
-'     PesananController -> HalamanTransaksi : Tampilkan notifikasi("Detail Pesanan Tidak Ditemukan") (Langkah 5.a)
-'     deactivate PesananController
-    
-'     activate HalamanTransaksi
-'     HalamanTransaksi -> Pembeli : Menerima notifikasi gagal & diarahkan kembali
-'     deactivate HalamanTransaksi
-' end alt
+deactivate Pembeli
 
 @enduml

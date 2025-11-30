@@ -5,53 +5,33 @@ skinparam style strictuml
 actor Admin
 boundary HalamanTambahProduk
 control ProdukController
-entity produk
-' box "Sistem Manajemen Produk"
-'     participant HalamanTambahProduk
-'     participant ProdukController
-' end box
+entity Produk
 
 activate Admin
-Admin -> HalamanTambahProduk : Mengakses halaman tambah produk (Langkah 1)
+Admin -> HalamanTambahProduk : Mengakses halaman "/admin/produk/tambah"
 activate HalamanTambahProduk
 
-HalamanTambahProduk -> Admin : Tampilkan formulir input produk (Langkah 1)
+HalamanTambahProduk -> Admin : Tampilkan formulir input produk
 
-Admin -> HalamanTambahProduk : Mengisi data produk lengkap (Langkah 2)
+Admin -> HalamanTambahProduk : Mengisi data produk lengkap
 
-Admin -> HalamanTambahProduk : Menekan tombol "Tambahkan" (Langkah 3)
+Admin -> HalamanTambahProduk : Klik "Tambahkan"
 
-HalamanTambahProduk -> ProdukController : tambahProduk(Data Produk Baru)
+HalamanTambahProduk -> ProdukController : POST /admin/produk (request: object)
 activate ProdukController
 
-' UserController -> ProdukController : Validasi kelengkapan dan format data (Langkah 4)
+ProdukController -> Produk : validate(request.data)
+activate Produk
 
-ProdukController -> produk : Simpan informasi produk baru (Status='Aktif') (Langkah 5.a)
-activate produk
-return ID_Produk_Baru
-deactivate produk
+ProdukController -> Produk : create(request.data)
+Produk --> ProdukController : NewProduct: Produk
+deactivate Produk
 
-ProdukController -> HalamanTambahProduk : Tampilkan notifikasi("Produk berhasil ditambahkan") (Langkah 5.b)
-
-ProdukController -> HalamanTambahProduk : Perbarui halaman katalog Pembeli (Langkah 6)
+ProdukController --> HalamanTambahProduk : responseSuccess(NewProduct)
 deactivate ProdukController
 
-HalamanTambahProduk -> Admin : Menerima notifikasi sukses
-
-' alt Gagal Validasi (Alternative Flow 4.a)
-'     ProdukController -> HalamanTambahProduk : Tampilkan notifikasi("Penambahan Gagal...") (Langkah 5.a)
-'     deactivate ProdukController
-    
-'     HalamanTambahProduk -> Admin : Tampilkan notifikasi gagal
-    
-'     note over Admin, HalamanTambahProduk
-'         Melengkapi/memperbaiki data (Langkah 6.a)
-'         Kembali ke Langkah 3 (Langkah 6.b)
-'     end note
-' else Validasi Sukses (Main Flow)
-
-' end alt
-
+HalamanTambahProduk -> Admin : Tampilkan notifikasi dan redirect ke daftar produk
 deactivate HalamanTambahProduk
+deactivate Admin
 
 @enduml

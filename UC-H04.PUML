@@ -5,50 +5,29 @@ skinparam style strictuml
 actor Admin
 boundary HalamanKelolaProduk
 control ProdukController
-entity produk
-' box "Sistem Manajemen Produk"
-'     participant HalamanKelolaProduk
-'     participant ProdukController
-' end box
+entity Produk
 
 activate Admin
-Admin -> HalamanKelolaProduk : Mengakses halaman kelola produk (Langkah 1)
+Admin -> HalamanKelolaProduk : Mengakses halaman "/admin/produk"
 activate HalamanKelolaProduk
 
-HalamanKelolaProduk -> Admin : Tampilkan daftar seluruh katalog produk (Langkah 1 & 2)
+HalamanKelolaProduk -> Admin : Tampilkan daftar seluruh produk
 
-Admin -> HalamanKelolaProduk : Memilih produk & menekan tombol "Arsipkan" (Langkah 3)
-' HalamanKelolaProduk -> HalamanKelolaProduk : Tampilkan kotak dialog konfirmasi (Langkah 3)
+Admin -> HalamanKelolaProduk : Klik "Arsipkan" (ID_Produk: integer)
 
-' Admin -> HalamanKelolaProduk : Memilih "Ya, Arsipkan" / "Batal" (Langkah 4 / 4.a)
-
-HalamanKelolaProduk -> ProdukController : arsipProduk(ID_Produk)
+HalamanKelolaProduk -> ProdukController : PATCH /admin/produk/{ID_Produk} (request: {status: 'Arsip'})
 activate ProdukController
 
-ProdukController -> produk : Memproses pembaruan status menjadi 'Arsip' (Langkah 5)
-activate produk
-return Status Operasi
-deactivate produk
+ProdukController -> Produk : updateStatus(ID_Produk, 'Arsip')
+activate Produk
+Produk --> ProdukController : updateStatus: boolean
+deactivate Produk
 
-ProdukController -> HalamanKelolaProduk : Tampilkan notifikasi("Produk berhasil diarsipkan") (Langkah 6)
-
-ProdukController -> HalamanKelolaProduk : Perbarui daftar kelola produk (Langkah 7)
+ProdukController --> HalamanKelolaProduk : responseSuccess(message: string)
 deactivate ProdukController
 
-HalamanKelolaProduk -> Admin : Menerima notifikasi sukses dan daftar terbaru
-
-' alt Jika Admin Memilih "Ya, Arsipkan" (Main Flow)
-
-' else Jika Admin Memilih "Batal" (Alternative Flow 4.a)
-'     HalamanKelolaProduk -> ProdukController : batalkanPengarsipan(ID_Produk)
-'     activate ProdukController
-    
-'     ProdukController -> HalamanKelolaProduk : Berikan notifikasi("Pengarsipan dibatalkan.") (Langkah 5.a)
-'     deactivate ProdukController
-    
-'     HalamanKelolaProduk -> Admin : Menerima notifikasi pembatalan (Langkah 5.a)
-' end alt
-
+HalamanKelolaProduk -> Admin : Tampilkan notifikasi sukses dan daftar terbaru
 deactivate HalamanKelolaProduk
+deactivate Admin
 
 @enduml

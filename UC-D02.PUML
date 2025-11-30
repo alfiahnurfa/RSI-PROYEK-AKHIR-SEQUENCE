@@ -1,0 +1,46 @@
+@startuml SD-UC-D02_MelakukanKonfirmasiPembayaran
+title Sequence Diagram UC-D02: Melakukan Konfirmasi Pembayaran
+skinparam style strictuml
+
+actor Pembeli
+boundary HalamanPembayaran
+control PembayaranController
+entity Pembayaran
+
+activate Pembeli
+Pembeli -> HalamanPembayaran : Mengakses /dashboard/pembayaran/{ID_Pesanan}
+activate HalamanPembayaran
+
+HalamanPembayaran -> PembayaranController : GET /pembayaran/{ID_Pesanan}
+activate PembayaranController
+PembayaranController -> Pembayaran : findDetailById(ID_Pesanan)
+activate Pembayaran
+Pembayaran --> PembayaranController : PaymentData: object (termasuk QR info)
+deactivate Pembayaran
+
+PembayaranController --> HalamanPembayaran : response(PaymentData)
+deactivate PembayaranController
+
+HalamanPembayaran -> Pembeli : Tampilkan QR Code dan tombol "Konfirmasi Pembayaran"
+
+Pembeli -> HalamanPembayaran : Menyelesaikan pembayaran (scan QR)
+Pembeli -> HalamanPembayaran : Klik "Konfirmasi Pembayaran"
+
+HalamanPembayaran -> PembayaranController : PATCH /pembayaran/{ID_Pesanan}/konfirmasi
+activate PembayaranController
+
+PembayaranController -> Pembayaran : validate(request.data)
+activate Pembayaran
+
+PembayaranController -> Pembayaran : updateStatus(ID_Pesanan, 'menunggu_konfirmasi')
+Pembayaran --> PembayaranController : updateStatus: boolean
+deactivate Pembayaran
+
+PembayaranController --> HalamanPembayaran : responseSuccess(message: string)
+deactivate PembayaranController
+
+HalamanPembayaran -> Pembeli : Tampilkan notifikasi sukses dan status terbaru
+deactivate HalamanPembayaran
+deactivate Pembeli
+
+@enduml

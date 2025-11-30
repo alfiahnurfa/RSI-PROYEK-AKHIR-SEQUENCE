@@ -5,49 +5,29 @@ skinparam style strictuml
 actor Pembeli
 boundary HalamanDetailPesanan
 control KomplainController
-entity komplain
-' participant Admin as "Admin\n(Sistem Penerima)"
-
-' box "Sistem Pengaduan"
-'     participant HalamanDetailPesanan
-'     participant KomplainController
-' end box
+entity Komplain
 
 activate Pembeli
-Pembeli -> HalamanDetailPesanan : Mengakses halaman detail pesanan (ID_Pesanan) (Langkah 1)
+Pembeli -> HalamanDetailPesanan : Mengakses halaman detail pesanan
 activate HalamanDetailPesanan
 
-HalamanDetailPesanan -> KomplainController : Periksa Status Pesanan (Langkah 1 & 2)
+Pembeli -> HalamanDetailPesanan : Input dan Submit(Data Pengaduan)
 
-HalamanDetailPesanan -> Pembeli : Tampilkan tombol "Beri Pengaduan" (Langkah 2)
-
-Pembeli -> HalamanDetailPesanan : Menekan tombol "Beri Pengaduan" (Langkah 3)
-HalamanDetailPesanan -> KomplainController : Tampilkan formulir pengaduan (Langkah 3)
-
-Pembeli -> HalamanDetailPesanan : Mengisi formulir (Judul, Deskripsi, Bukti) (Langkah 4)
-
-Pembeli -> HalamanDetailPesanan : Mengirimkan pengaduan (Langkah 5)
-HalamanDetailPesanan -> KomplainController : ajukanKomplain(Data Pengaduan)
+HalamanDetailPesanan -> KomplainController : POST /komplain (request: object)
 activate KomplainController
 
-KomplainController -> komplain : Validasi data (Langkah 5)
-KomplainController -> komplain : Simpan laporan (Status='Baru') (Langkah 6.a)
-activate komplain
-return ID_Komplain
-deactivate komplain
-' KomplainController -> Admin : Teruskan notifikasi laporan baru (Langkah 6.b)
-KomplainController -> Pembeli : Tampilkan notifikasi("Laporan Berhasil Dikirim") (Langkah 7)
+KomplainController -> Komplain : validate(request.data)
+activate Komplain
+
+KomplainController -> Komplain : create(request.data)
+Komplain --> KomplainController : KomplainData: Komplain
+deactivate Komplain
+
+KomplainController --> HalamanDetailPesanan : responseSuccess(message: string)
 deactivate KomplainController
 
-' alt Jika Status = "Selesai" (Main Flow)
-
-' else Jika Status Belum "Selesai" (Alternative Flow 2.a)
-'     HalamanDetailPesanan -> Pembeli : Tombol "Beri Pengaduan" dinonaktifkan / disembunyikan (Langkah 3.a)
-    
-'     note over HalamanDetailPesanan
-'         Pesan: Pengaduan hanya bisa diajukan setelah pesanan selesai.
-'     end note
-' end alt
+HalamanDetailPesanan -> Pembeli : Tampilkan notifikasi sukses
 deactivate HalamanDetailPesanan
+deactivate Pembeli
 
 @enduml

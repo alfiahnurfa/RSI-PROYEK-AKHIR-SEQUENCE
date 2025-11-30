@@ -1,32 +1,29 @@
 @startuml SD-UC-B01_MelihatKatalog
-title Sequence Diagram UC-B01: Melihat Seluruh Katalog Produk (Alur Utama)
+title Sequence Diagram UC-B01: Melihat Seluruh Katalog Produk
 skinparam style strictuml
 
 actor Pembeli
 boundary HalamanKatalog
 control ProdukController
-entity produk
-' box "Sistem Katalog"
-'     participant HalamanKatalog
-'     participant ProdukController
-' end box
+entity Produk
 
 activate Pembeli
-Pembeli -> HalamanKatalog : Akses dashboard / Klik "Lihat Selengkapnya" (Langkah 1)
+Pembeli -> HalamanKatalog : Akses '/dashboard/produk'
 activate HalamanKatalog
 
-HalamanKatalog -> ProdukController : ambilSemuaProdukAktif()
+HalamanKatalog -> ProdukController : GET /produk
 activate ProdukController
 
-ProdukController -> produk : Ambil semua data produk dengan Status='Aktif' (Langkah 1)
-activate produk
-return List Produk Aktif
+ProdukController -> Produk : findByStatus(status: 'Aktif')
+activate Produk
+Produk --> ProdukController : ProductList: List<Produk>
+deactivate Produk
 
-ProdukController -> HalamanKatalog : Tampilkan katalog(List Produk Aktif)
+ProdukController --> HalamanKatalog : response(ProductList)
 deactivate ProdukController
 
-HalamanKatalog -> Pembeli : Tampilkan seluruh katalog produk toko (Langkah 2 & 3)
+HalamanKatalog -> Pembeli : Tampilkan seluruh katalog produk
 deactivate HalamanKatalog
-deactivate produk
+deactivate Pembeli
 
 @enduml

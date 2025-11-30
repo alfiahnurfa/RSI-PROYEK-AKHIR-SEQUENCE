@@ -6,58 +6,41 @@ actor Admin
 boundary HalamanPusatPengaduan
 boundary HalamanDetailKomplain
 control KomplainController
-entity komplain
-
-' box "Sistem Penanganan Komplain"
-'     participant HalamanPusatPengaduan
-'     participant HalamanDetailKomplain
-'     participant KomplainController
-' end box
+entity Komplain
 
 activate Admin
-Admin -> HalamanPusatPengaduan : Mengakses halaman pusat pengaduan (Langkah 1)
+Admin -> HalamanPusatPengaduan : Mengakses halaman "/admin/aduan"
 activate HalamanPusatPengaduan
 
-HalamanPusatPengaduan -> KomplainController : ambilDaftarKomplainAktif()
+HalamanPusatPengaduan -> KomplainController : GET /admin/komplain
 activate KomplainController
 
-KomplainController -> komplain : Mengambil daftar pengaduan (Status 'Baru' atau 'Dalam Proses') (Langkah 2)
-activate komplain
-return List Ringkasan Komplain / List Kosong (Langkah 2.a)
-deactivate komplain
+KomplainController -> Komplain : findAll()
+activate Komplain
+Komplain --> KomplainController : List Ringkasan Komplain: List<Komplain>
+deactivate Komplain
 
-KomplainController -> HalamanPusatPengaduan : Tampilkan daftar ringkasan pengaduan (Langkah 2)
+KomplainController --> HalamanPusatPengaduan : response(List Ringkasan Komplain)
 deactivate KomplainController
 
-Admin -> HalamanPusatPengaduan : Memilih laporan yang ingin dilihat detailnya (Langkah 3)
+HalamanPusatPengaduan -> Admin : Tampilkan daftar ringkasan pengaduan
 
-HalamanPusatPengaduan -> KomplainController : ambilDetailKomplain(ID_Komplain)
+Admin -> HalamanPusatPengaduan : Klik laporan (ID_Komplain: integer)
+
+HalamanPusatPengaduan -> KomplainController : GET /admin/komplain/{ID_Komplain}
 activate KomplainController
 
-KomplainController -> komplain : Mengambil seluruh data detail laporan (Langkah 5)
-activate komplain
-return Data Detail Komplain Lengkap
-deactivate komplain
+KomplainController -> Komplain : findById(ID_Komplain: integer)
+activate Komplain
+Komplain --> KomplainController : Data Detail Komplain: Komplain
+deactivate Komplain
 
-KomplainController -> HalamanDetailKomplain : Tampilkan halaman detail laporan (Langkah 6)
+KomplainController --> HalamanDetailKomplain : response(Data Detail Komplain)
 deactivate KomplainController
 activate HalamanDetailKomplain
 
-HalamanDetailKomplain -> Admin : Melihat dan meninjau detail laporan (Langkah 7)
+HalamanDetailKomplain -> Admin : Melihat dan meninjau detail laporan
 deactivate HalamanDetailKomplain
-
-' alt Jika Komplain Ditemukan (Main Flow)
-
-
-' else Jika Daftar Komplain Kosong (Alternative Flow 2.a)
-'     note over KomplainController
-'         List Komplain Kosong
-'     end note
-'     KomplainController -> HalamanPusatPengaduan : Tampilkan notifikasi("Tidak ada laporan pengaduan...") (Langkah 3.a)
-'     deactivate KomplainController
-
-'     HalamanPusatPengaduan -> Admin : Menerima notifikasi daftar kosong
-' end alt
-deactivate HalamanPusatPengaduan
+deactivate Admin
 
 @enduml

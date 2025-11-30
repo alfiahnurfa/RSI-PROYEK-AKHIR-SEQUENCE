@@ -1,95 +1,54 @@
-@startuml SD-UC-D01_MelakukanPembayaran
-title Sequence Diagram UC-D01: Menginisiasi Checkout & Menyelesaikan Pembayaran
+@startuml SD-UC-D01_MelakukanProsesPemesanan
+title Sequence Diagram UC-D01: Melakukan Proses Pemesanan
 skinparam style strictuml
 
 actor Pembeli
 boundary HalamanCheckout
-boundary HalamanPembayaran
 control PesananController
-control PembayaranController
-entity pesanan
-entity pembayaran
-participant SistemEksternal as "Aplikasi Pembayaran"
-
-' box "Sistem Transaksi & Pembayaran"
-'     participant HalamanCheckout
-'     participant HalamanPembayaran
-'     participant PesananController
-'     participant PembayaranController
-' end box
+entity Pesanan
+entity DetailPesanan
+entity Pembayaran
 
 activate Pembeli
-
-Pembeli -> HalamanCheckout : Klik "Beli" (dari keranjang) / "Beli Langsung" (dari katalog)
-' alt Inisiasi Pesanan (Langkah 1)
-    
-' else
-'     note over Pembeli
-'         Asumsi proses inisiasi (membuat entri pesanan) terjadi di sini
-'     end note
-' end
+Pembeli -> HalamanCheckout : Mengakses halaman Checkout
 activate HalamanCheckout
 
-HalamanCheckout -> PesananController : buatPesanan()
+HalamanCheckout -> PesananController : GET /checkout (auth_id)
 activate PesananController
-PesananController -> pesanan : Buat entri Pesanan baru
-activate pesanan
-return ID_Pesanan
-deactivate pesanan
+PesananController -> DetailPesanan : getCartItems(auth_id)
+activate DetailPesanan
+DetailPesanan --> PesananController : CartData: object
+deactivate DetailPesanan
 
-PesananController -> HalamanCheckout : Arahkan ke rincian pesanan
+PesananController --> HalamanCheckout : displayCheckoutForm(CartData)
 deactivate PesananController
 
-HalamanCheckout -> Pembeli : Tampilkan rincian pesanan (Langkah 2)
+Pembeli -> HalamanCheckout : Konfirmasi Alamat & Pilih Metode Bayar
+Pembeli -> HalamanCheckout : Klik "Beli Sekarang"
 
-Pembeli -> HalamanCheckout : Klik "Bayar Sekarang" (Langkah 3)
+HalamanCheckout -> PesananController : POST /pesanan (request: CheckoutRequest)
+activate PesananController
 
-HalamanCheckout -> PembayaranController : inisiasiPembayaran(ID_Pesanan)
-activate PembayaranController
-PembayaranController -> pembayaran : Buat entri Pembayaran (Status: Menunggu Pembayaran)
-activate pembayaran
-return ID_Pembayaran
-deactivate pembayaran
+PesananController -> Pesanan : validate(request.data)
+activate Pesanan
 
-PembayaranController -> HalamanPembayaran : Tampilkan QR Pembayaran (Langkah 3)
-deactivate PembayaranController
-activate HalamanPembayaran
+PesananController -> Pesanan : createOrder(request.data, auth_id)
+Pesanan -> DetailPesanan : finalizeItems(auth_id)
+activate DetailPesanan
+Pesanan -> DetailPesanan : calculateTotal()
+deactivate DetailPesanan
+Pesanan -> Pembayaran : createPaymentRecord()
+activate Pembayaran
+Pembayaran --> Pesanan : PaymentData: object
+deactivate Pembayaran
+Pesanan --> PesananController : NewOrderID: integer
+deactivate Pesanan
 
-group Alur Pembayaran
-    ' alt Pembayaran Dibatalkan Otomatis (Alternative Flow 3.a, 5.a, 6.a, 7.a)
-    '     Sistem -> pembayaran : Catat Waktu Kedaluwarsa (Langkah 3.a)
-    '     Sistem -> pembayaran : Cek Batas Waktu Habis (Langkah 5.a)
-        
-    '     note over Sistem, Pembeli
-    '         Jika batas waktu terlewati
-    '     end note
+PesananController --> HalamanCheckout : responseSuccess(NewOrderID)
+deactivate PesananController
 
-    '     pembayaran -> pesanan : Update Status='Dibatalkan Otomatis' (Langkah 6.a)
-    '     HalamanPembayaran -> Pembeli : Tampilkan notifikasi pembatalan (Langkah 7.a)
-    ' else Pembayaran Sukses (Main Flow 4-9)
-        Pembeli -> SistemEksternal : Memindai QR & Melakukan pembayaran (Langkah 4, 5)
-        
-        Pembeli -> HalamanPembayaran : Klik "Konfirmasi Pembayaran" (Langkah 6)
-        HalamanPembayaran -> PembayaranController : konfirmasiPembayaran(ID_Pembayaran)
-        activate PembayaranController
-
-        PembayaranController -> PembayaranController : Verifikasi dengan Payment Gateway (Langkah 7)
-        
-        PembayaranController -> pembayaran : Update Status='Selesai' (Langkah 8.a)
-        PembayaranController -> pesanan : Update Status='Diproses/Dikemas' (Langkah 8.b)
-
-        PembayaranController -> HalamanPembayaran : Tampilkan notifikasi("Pembayaran Selesai") (Langkah 9)
-        deactivate PembayaranController
-
-        HalamanPembayaran -> Pembeli : Menerima notifikasi sukses (Langkah 9)
-    ' end alt
-end
-
-deactivate HalamanPembayaran
-deactivate Pembeli
+HalamanCheckout -> Pembeli : Redirect ke /dashboard/transaksi/{NewOrderID}
 deactivate HalamanCheckout
-deactivate pesanan
-deactivate pembayaran
-deactivate SistemEksternal
+deactivate Pembeli
 
 @enduml

@@ -5,58 +5,41 @@ skinparam style strictuml
 actor Pengguna
 boundary HalamanProfil
 control UserController
-entity user
-
-' box "Sistem Keamanan Akun"
-'     participant HalamanProfil
-'     participant UserController
-' end box
+entity User
 
 activate Pengguna
-Pengguna -> HalamanProfil : Mengakses halaman profil (Langkah 1)
+Pengguna -> HalamanProfil : Mengakses halaman profil
 activate HalamanProfil
 
-Pengguna -> HalamanProfil : Klik "Ubah Kata Sandi" (Langkah 2)
-HalamanProfil -> UserController : Tampilkan formulir perubahan sandi (Langkah 2)
+Pengguna -> HalamanProfil : Klik "Ubah Kata Sandi"
+HalamanProfil -> Pengguna : Tampilkan formulir perubahan sandi
 
-Pengguna -> HalamanProfil : Input Sandi Lama, Sandi Baru, Konfirmasi (Langkah 3)
+Pengguna -> HalamanProfil : Input(old_password, new_password, confirmation)
 
-Pengguna -> HalamanProfil : Menekan tombol "Simpan Kata Sandi" (Langkah 4)
+Pengguna -> HalamanProfil : Klik "Simpan Kata Sandi"
 
-HalamanProfil -> UserController : ubahKataSandi(id_pengguna, sandi_lama, sandi_baru)
+HalamanProfil -> UserController : changePassword(request: ChangePasswordRequest)
 activate UserController
 
-UserController -> user : Ambil hash sandi lama
-activate user
-user --> UserController : Hash Sandi Lama Tersimpan
-deactivate user
+UserController -> User : validate(request.data)
+activate User
+UserController -> User : findById(auth_id)
 
-UserController -> user : Validasi (Sandi Lama cocok? Sandi Baru=Konfirmasi?) (Langkah 4)
+User --> UserController : UserData: User
+deactivate User
 
-UserController -> user : HASH Sandi Baru
-UserController -> user : Update hash sandi baru (Langkah 5)
-activate user
-user --> UserController : Status Update
-deactivate user
+UserController -> User : verifyAndHash(old_password, new_password, UserData.hash)
+activate User
+UserController -> User : updatePassword(auth_id, new_password_hash)
 
-UserController -> HalamanProfil : Tampilkan notifikasi("Kata Sandi Berhasil Diperbarui") (Langkah 6)
+User --> UserController : Status Update: boolean
+deactivate User
+
+UserController --> HalamanProfil : responseSuccess("Kata Sandi Berhasil Diperbarui")
 deactivate UserController
 
 HalamanProfil -> Pengguna : Notifikasi sukses
 deactivate HalamanProfil
-
-' alt Gagal Validasi (Alternative Flow 4.a)
-'     UserController -> HalamanProfil : Tampilkan notifikasi("Gagal: Kredensial tidak sesuai...") (Langkah 4.b)
-'     deactivate UserController
-    
-'     HalamanProfil -> Pengguna : Tampilkan notifikasi gagal
-    
-'     note over Pengguna, HalamanProfil
-'         Memperbaiki input (Langkah 4.c)
-'         Kembali ke Langkah 3 (Langkah 4.d)
-'     end note
-' else Validasi Sukses (Main Flow)
-
-' end alt
+deactivate Pengguna
 
 @enduml

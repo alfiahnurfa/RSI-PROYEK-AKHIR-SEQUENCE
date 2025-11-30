@@ -6,67 +6,47 @@ actor Admin
 boundary HalamanDaftarBerita
 boundary HalamanFormEditBerita
 control BeritaController
-entity berita
-
-' box "Sistem Manajemen Berita"
-'     participant HalamanDaftarBerita
-'     participant HalamanFormEditBerita
-'     participant BeritaController
-' end box
+entity Berita
 
 activate Admin
-Admin -> HalamanDaftarBerita : Mengakses halaman daftar berita (Langkah 1)
+Admin -> HalamanDaftarBerita : Mengakses halaman "/admin/berita"
 activate HalamanDaftarBerita
 
-HalamanDaftarBerita -> Admin : Tampilkan daftar berita (Langkah 1 & 2)
+HalamanDaftarBerita -> Admin : Tampilkan daftar berita
 
-Admin -> HalamanDaftarBerita : Memilih berita & menekan tombol "Edit" (Langkah 3)
-HalamanDaftarBerita -> BeritaController : ambilKontenBerita(ID_Berita)
+Admin -> HalamanDaftarBerita : Klik "Edit" (ID_Berita: integer)
+HalamanDaftarBerita -> BeritaController : GET /admin/berita/{ID_Berita}
 deactivate HalamanDaftarBerita
 activate BeritaController
 
-BeritaController -> berita : Mengambil seluruh konten berita saat ini (Langkah 4)
-activate berita
-return Data Konten Berita
-deactivate berita
+BeritaController -> Berita : findById(ID_Berita: integer)
+activate Berita
+Berita --> BeritaController : DataKonten: Berita
+deactivate Berita
 
-BeritaController -> HalamanFormEditBerita : Tampilkan halaman form edit (Langkah 4)
+BeritaController -> HalamanFormEditBerita : response(DataKonten)
 deactivate BeritaController
 activate HalamanFormEditBerita
 
-Admin -> HalamanFormEditBerita : Melakukan perubahan pada konten (Langkah 5)
+Admin -> HalamanFormEditBerita : Melakukan perubahan konten
 
-Admin -> HalamanFormEditBerita : Menekan tombol "Terbitkan" / "Perbarui" (Langkah 6)
+Admin -> HalamanFormEditBerita : Klik "Perbarui"
 
-HalamanFormEditBerita -> BeritaController : ubahBerita(ID_Berita, Data Update)
+HalamanFormEditBerita -> BeritaController : PUT /admin/berita/{ID_Berita} (request: object)
 activate BeritaController
 
-' BeritaController -> BeritaController : Validasi kelengkapan data (Langkah 7)
+BeritaController -> Berita : validate(request.data)
+activate Berita
 
-BeritaController -> berita : Memperbarui data berita di database (Langkah 8)
-activate berita
-return Status Update
-deactivate berita
+BeritaController -> Berita : update(ID_Berita, request.data)
+Berita --> BeritaController : UpdateStatus: boolean
+deactivate Berita
 
-BeritaController -> HalamanDaftarBerita : Tampilkan notifikasi("Berita berhasil diperbarui") (Langkah 9)
-BeritaController -> HalamanDaftarBerita : Muat ulang daftar berita Admin & Pembeli (Langkah 9)
+BeritaController --> HalamanFormEditBerita : responseSuccess(message: string)
 deactivate BeritaController
 
-HalamanFormEditBerita -> Admin : Menerima notifikasi sukses
+HalamanFormEditBerita -> Admin : Tampilkan notifikasi sukses dan redirect
 deactivate HalamanFormEditBerita
-
-' alt Gagal Validasi (Alternative Flow 7.a)
-'     BeritaController -> HalamanFormEditBerita : Tampilkan notifikasi("Pembaruan Gagal: Mohon perbaiki...") (Langkah 8.a)
-'     deactivate BeritaController
-
-'     HalamanFormEditBerita -> Admin : Menerima notifikasi gagal
-    
-'     note over Admin, HalamanFormEditBerita
-'         Memperbaiki data (Langkah 9.a)
-'         Kembali ke Langkah 6 (Langkah 9.b)
-'     end note
-' else Validasi Sukses (Main Flow)
-
-' end alt
+deactivate Admin
 
 @enduml

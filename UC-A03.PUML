@@ -1,62 +1,43 @@
 @startuml SD-UC-A03_UpdateProfil
-title Sequence Diagram UC-A03: Mengelola dan Memperbarui Data Profil
+title Sequence Diagram UC-A03: Memperbarui Data Profil
 skinparam style strictuml
 
 actor Pengguna
 boundary HalamanProfil
 control UserController
-entity user
-
-' box "Sistem Profil"
-'     participant HalamanProfil
-'     participant UserController
-' end box
+entity User
 
 activate Pengguna
-
-Pengguna -> HalamanProfil : Mengakses halaman profil (Langkah 1)
+Pengguna -> HalamanProfil : Mengakses halaman profil
 activate HalamanProfil
-HalamanProfil -> UserController : ambilProfil(id_pengguna)
+HalamanProfil -> UserController : getAuthenticatedUser()
 activate UserController
-UserController -> user : Query data profil
-activate user
-user --> UserController : Data Profil Terkini
-deactivate user
-UserController --> HalamanProfil : Tampilkan Data Profil (Langkah 1)
+UserController -> User : findById(auth_id: integer)
+activate User
+User --> UserController : UserData: User
+deactivate User
+UserController --> HalamanProfil : displayProfile(UserData)
 deactivate UserController
 
-Pengguna -> HalamanProfil : Mengisi/mengubah informasi profil (Langkah 3)
+Pengguna -> HalamanProfil : Input(UpdateData)
 
-Pengguna -> HalamanProfil : Menekan tombol "Simpan Profil" (Langkah 4)
+Pengguna -> HalamanProfil : Klik "Simpan Profil"
 
-HalamanProfil -> UserController : perbaruiProfil(id_pengguna, data_update)
+HalamanProfil -> UserController : updateProfile(request: UpdateRequest)
 activate UserController
 
-UserController -> user : Validasi format data (Langkah 5)
+UserController -> User : validate(request.data)
+activate User
+UserController -> User : update(auth_id, request.data)
 
-UserController -> user : Simpan data profil baru (Langkah 6)
-activate user
-user --> UserController : Status Update
-deactivate user
+User --> UserController : UpdatedUser: User
+deactivate User
     
-UserController -> HalamanProfil : Tampilkan notifikasi("Update Profil Berhasil") (Langkah 7)
+UserController --> HalamanProfil : responseSuccess(UpdatedUser)
 deactivate UserController
     
-HalamanProfil -> Pengguna : Tampilkan profil terbaru (Langkah 7, 8)
+HalamanProfil -> Pengguna : Tampilkan profil terbaru
 deactivate HalamanProfil
-
-' alt Gagal Validasi (Alternative Flow 5.a)
-'     UserController -> HalamanProfil : Tampilkan notifikasi("Update Profil Gagal") (Langkah 5.b)
-'     deactivate UserController
-    
-'     HalamanProfil -> Pengguna : Tampilkan notifikasi gagal & sorot kolom
-    
-'     note over Pengguna, HalamanProfil
-'         Memperbaiki data (Langkah 5.c)
-'         Kembali ke Langkah 4 (Langkah 5.d)
-'     end note
-' else Validasi Sukses (Main Flow)
-
-' end alt
+deactivate Pengguna
 
 @enduml

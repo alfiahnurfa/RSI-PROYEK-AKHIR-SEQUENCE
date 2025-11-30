@@ -5,58 +5,27 @@ skinparam style strictuml
 actor Pembeli
 boundary HalamanKatalog
 control ProdukController
-entity produk
-' box "Sistem Filter Katalog"
-'     participant HalamanKatalog
-'     participant ProdukController
-' end box
+entity Produk
 
 activate Pembeli
-Pembeli -> HalamanKatalog : Mengakses halaman katalog (Langkah 1 & 1.a)
+Pembeli -> HalamanKatalog : Akses halaman katalog
 activate HalamanKatalog
 
-alt Filter Berdasarkan Kategori (Main Flow)
-    Pembeli -> HalamanKatalog : Memilih kategori (Langkah 2)
-    HalamanKatalog -> ProdukController : filterProduk(kategori)
-    activate ProdukController
-    
-    ProdukController -> produk : Melakukan filter database berdasarkan Kategori (Langkah 3)
-    activate produk
-    return List Produk Filtered / List Kosong (Langkah 3.b)
-    deactivate produk
-    
-    ProdukController -> HalamanKatalog : Tampilkan produk hasil filter (Langkah 4)
+Pembeli -> HalamanKatalog : Pilih filter (kategori/harga/sort)
 
-    ' alt Hasil Ditemukan
-    ' else Hasil Tidak Ditemukan (Alternative Flow)
-    '     ProdukController -> HalamanKatalog : Tampilkan notifikasi("Tidak ada produk yang sesuai...")
-    ' end
-    deactivate ProdukController
-    
-    HalamanKatalog -> Pembeli : Melihat produk yang tersaring (Langkah 5)
-    
-else Filter Berdasarkan Harga (Alternative Flow 2.a)
-    Pembeli -> HalamanKatalog : Memilih rentang harga (Harga Min, Harga Max)
-    
-    Pembeli -> HalamanKatalog : Menerapkan filter (Langkah 3.a)
-    HalamanKatalog -> ProdukController : filterProduk(harga_min, harga_max)
-    activate ProdukController
+HalamanKatalog -> ProdukController : filter(filterCriteria: FilterCriteria)
+activate ProdukController
 
-    ProdukController -> produk : Melakukan filter database berdasarkan Rentang Harga (Langkah 4.a)
-    activate produk
-    return List Produk Filtered / List Kosong (Langkah 3.b)
-    deactivate produk
-    ProdukController -> HalamanKatalog : Tampilkan produk hasil filter (Langkah 5.a)
+ProdukController -> Produk : filterByCriteria(filterCriteria.data)
+activate Produk
+Produk --> ProdukController : FilteredProductList: List<Produk>
+deactivate Produk
 
-    ' alt Hasil Ditemukan
-    ' else Hasil Tidak Ditemukan (Alternative Flow)
-    '     ProdukController -> HalamanKatalog : Tampilkan notifikasi("Tidak ada produk yang sesuai...")
-    ' end
-    deactivate ProdukController
+ProdukController --> HalamanKatalog : FilteredProductList
+deactivate ProdukController
 
-    HalamanKatalog -> Pembeli : Melihat produk yang tersaring (Langkah 6)
-    
-end alt
+HalamanKatalog -> Pembeli : Tampilkan produk yang tersaring
 deactivate HalamanKatalog
+deactivate Pembeli
 
 @enduml

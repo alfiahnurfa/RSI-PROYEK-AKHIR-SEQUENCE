@@ -1,56 +1,38 @@
 @startuml SD-UC-A01_MendaftarAkun
-title Sequence Diagram UC-A01: Mendaftar dan Membuat Akun
+title Sequence Diagram UC-A01: Mendaftar Akun
 skinparam style strictuml
 
 actor Pengguna
 boundary HalamanRegister
 control UserController
-entity user
-' box "Sistem Pendaftaran"
-'     participant HalamanRegister
-'     participant UserController
-' end box
+entity User
 
 activate Pengguna
 Pengguna -> HalamanRegister : Mengakses halaman Register
 activate HalamanRegister
 
-HalamanRegister -> Pengguna : Tampilkan formulir pendaftaran (Langkah 1)
+HalamanRegister -> Pengguna : Tampilkan formulir pendaftaran
 
-Pengguna -> HalamanRegister : Mengisi data lengkap (Langkah 2)
+Pengguna -> HalamanRegister : Input(Data Registrasi)
 
-Pengguna -> HalamanRegister : Menekan tombol "Daftar Sekarang" (Langkah 3)
+Pengguna -> HalamanRegister : Klik "Daftar Sekarang"
 
-HalamanRegister -> UserController : daftarPengguna(Data Register)
+HalamanRegister -> UserController : register(request: RegisterRequest)
 activate UserController
 
-UserController -> user : Validasi data (Format, Kelengkapan, Keunikan Email) (Langkah 4)
+UserController -> User : validate(request.data)
+activate User
 
-' alt Gagal Validasi (Alternative Flow 4.a)
-'     UserController -> HalamanRegister : Tampilkan notifikasi("Pendaftaran Gagal") (Langkah 4.b)
-'     HalamanRegister -> Pengguna : Tampilkan notifikasi dan sorot kolom bermasalah
-    
-'     Pengguna -> HalamanRegister : Memperbaiki data (Langkah 4.c)
-    
-'     note over Pengguna, HalamanRegister
-'         Kembali ke Langkah 3 (Main Flow) / Lanjutkan input
-'     end note
-' else Validasi Sukses (Langkah 4)
-'     
-' end alt
+UserController -> User : create(request.data)
 
-UserController -> user : HASH Password
-    UserController -> user : Simpan data pengguna baru(Data Hash, Status Aktif) (Langkah 5)
-    activate user
-    
-    user --> UserController : ID_Pengguna_Baru
-    deactivate user
+User --> UserController : user: User
+deactivate User
 
-    UserController -> HalamanRegister : Tampilkan notifikasi("Pendaftaran Berhasil") (Langkah 6)
-    deactivate UserController
+UserController --> HalamanRegister : responseSuccess(message: string)
+deactivate UserController
     
-    HalamanRegister -> Pengguna : Menerima notifikasi berhasil (Langkah 7)
-    deactivate HalamanRegister
+HalamanRegister -> Pengguna : Tampilkan notifikasi berhasil
+deactivate HalamanRegister
 deactivate Pengguna
 
 @enduml
