@@ -3,43 +3,44 @@ title Sequence Diagram UC-A04: Mengubah Kata Sandi Akun
 skinparam style strictuml
 
 actor Pengguna
-boundary HalamanProfil
-control UserController
+boundary "HalamanProfil" as HalamanProfil
+control UbahKataSandiController
 entity User
+database users
 
 activate Pengguna
-Pengguna -> HalamanProfil : Mengakses halaman profil
+Pengguna -> HalamanProfil : Input password baru
 activate HalamanProfil
 
 Pengguna -> HalamanProfil : Klik "Ubah Kata Sandi"
-HalamanProfil -> Pengguna : Tampilkan formulir perubahan sandi
 
-Pengguna -> HalamanProfil : Input(old_password, new_password, confirmation)
+HalamanProfil -> UbahKataSandiController : ubahKataSandi($request: Request)
+activate UbahKataSandiController
 
-Pengguna -> HalamanProfil : Klik "Simpan Kata Sandi"
+UbahKataSandiController -> UbahKataSandiController : validate($request: Request)
 
-HalamanProfil -> UserController : changePassword(request: ChangePasswordRequest)
-activate UserController
+' Cek Hash Password Lama
+UbahKataSandiController -> UbahKataSandiController : Hash::check($request->password: String)
 
-UserController -> User : validate(request.data)
+' Hashing Password Baru
+UbahKataSandiController -> UbahKataSandiController : Hash::make($request->password_baru: String)
+
+' Update ke Database
+UbahKataSandiController -> User : $user->save()
 activate User
-UserController -> User : findById(auth_id)
 
-User --> UserController : UserData: User
+User -> users : UPDATE users SET password = ... WHERE id = ...
+activate users
+users --> User : return(true: boolean)
+deactivate users
+
+User --> UbahKataSandiController : return(true: boolean)
 deactivate User
 
-UserController -> User : verifyAndHash(old_password, new_password, UserData.hash)
-activate User
-UserController -> User : updatePassword(auth_id, new_password_hash)
+UbahKataSandiController --> HalamanProfil : response($data: Array)
+deactivate UbahKataSandiController
 
-User --> UserController : Status Update: boolean
-deactivate User
-
-UserController --> HalamanProfil : responseSuccess("Kata Sandi Berhasil Diperbarui")
-deactivate UserController
-
-HalamanProfil -> Pengguna : Notifikasi sukses
+HalamanProfil -> Pengguna : Tampilkan notifikasi "Password berhasil diubah"
 deactivate HalamanProfil
 deactivate Pengguna
-
 @enduml

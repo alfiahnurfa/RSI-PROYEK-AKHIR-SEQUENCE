@@ -4,6 +4,7 @@ skinparam style strictuml
 
 actor Pengguna
 boundary login
+boundary dashboard
 control LoginController
 entity User
 database users
@@ -38,9 +39,10 @@ deactivate User
 LoginController --> login : response($data: Array)
 deactivate LoginController
 
-login -> login : router.push('/dashboard': String)
-login --> Pengguna : Tampilkan halaman dashboard
+login -> dashboard : router.push('/dashboard': String)
 deactivate login
+activate dashboard
+dashboard --> Pengguna : Tampilkan halaman dashboard
 deactivate Pengguna
 
 @enduml

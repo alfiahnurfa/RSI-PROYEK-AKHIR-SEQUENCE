@@ -4,6 +4,7 @@ skinparam style strictuml
 
 actor Pengguna
 boundary register
+boundary login
 control RegisterController
 entity User
 database users
@@ -38,10 +39,12 @@ deactivate User
 RegisterController --> register : response($data: Array)
 deactivate RegisterController
 
-register -> register : router.push('/auth/login')
-
-register -> Pengguna : Tampilkan halaman login
+register -> login : router.push('/auth/login')
 deactivate register
+activate login
+
+login -> Pengguna : Tampilkan halaman login
+deactivate login
 deactivate Pengguna
 
 @enduml

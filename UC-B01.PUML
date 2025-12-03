@@ -4,26 +4,32 @@ skinparam style strictuml
 
 actor Pembeli
 boundary HalamanKatalog
-control ProdukController
+control LihatProdukController
 entity Produk
+database produks
 
 activate Pembeli
-Pembeli -> HalamanKatalog : Akses '/dashboard/produk'
+Pembeli -> HalamanKatalog : Mengakses halaman '/produk'
 activate HalamanKatalog
 
-HalamanKatalog -> ProdukController : GET /produk
-activate ProdukController
+HalamanKatalog -> LihatProdukController : ambilSemuaProduk($request: Request)
+activate LihatProdukController
 
-ProdukController -> Produk : findByStatus(status: 'Aktif')
+LihatProdukController -> Produk : Produk::where('status_produk', 'Aktif')
 activate Produk
-Produk --> ProdukController : ProductList: List<Produk>
+
+Produk -> produks : SELECT * FROM produks WHERE status_produk = 'Aktif'
+activate produks
+produks --> Produk : return(produk: Array)
+deactivate produks
+
+Produk --> LihatProdukController : return(produk: Array)
 deactivate Produk
 
-ProdukController --> HalamanKatalog : response(ProductList)
-deactivate ProdukController
-
-HalamanKatalog -> Pembeli : Tampilkan seluruh katalog produk
+LihatProdukController --> HalamanKatalog : response($data: Array)
+deactivate LihatProdukController
+    
+HalamanKatalog -> Pembeli : Tampilkan daftar produk
 deactivate HalamanKatalog
 deactivate Pembeli
-
 @enduml
