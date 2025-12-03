@@ -3,36 +3,48 @@ title Sequence Diagram UC-A01: Mendaftar Akun
 skinparam style strictuml
 
 actor Pengguna
-boundary HalamanRegister
-control UserController
+boundary register
+boundary login
+control RegisterController
 entity User
+database users
 
 activate Pengguna
-Pengguna -> HalamanRegister : Mengakses halaman Register
-activate HalamanRegister
+Pengguna -> register : Mengakses halaman /auth/register
+activate register
 
-HalamanRegister -> Pengguna : Tampilkan formulir pendaftaran
+register -> Pengguna : Tampilkan halaman pendaftaran
 
-Pengguna -> HalamanRegister : Input(Data Registrasi)
+Pengguna -> register : Input data registrasi
 
-Pengguna -> HalamanRegister : Klik "Daftar Sekarang"
+Pengguna -> register : Klik "Daftar"
 
-HalamanRegister -> UserController : register(request: RegisterRequest)
-activate UserController
+register -> RegisterController : daftarPengguna($request: Request)
+activate RegisterController
 
-UserController -> User : validate(request.data)
+RegisterController -> RegisterController : validate($request: Request)
+
+RegisterController -> User : User::create($request: Request)
 activate User
 
-UserController -> User : create(request.data)
+User -> users : INSERT INTO users VALUES (data)
+activate users
 
-User --> UserController : user: User
+users --> User : return(user: Users)
+deactivate users
+
+User --> RegisterController : return(user: Users)
 deactivate User
 
-UserController --> HalamanRegister : responseSuccess(message: string)
-deactivate UserController
-    
-HalamanRegister -> Pengguna : Tampilkan notifikasi berhasil
-deactivate HalamanRegister
+RegisterController --> register : response($data: Array)
+deactivate RegisterController
+
+register -> login : router.push('/auth/login')
+deactivate register
+activate login
+
+login -> Pengguna : Tampilkan halaman login
+deactivate login
 deactivate Pengguna
 
 @enduml

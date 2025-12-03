@@ -4,38 +4,35 @@ skinparam style strictuml
 
 actor Pengguna
 boundary HalamanProfil
-control UserController
+control UbahProfilController
 entity User
+database users
 
 activate Pengguna
-Pengguna -> HalamanProfil : Mengakses halaman profil
-activate HalamanProfil
-HalamanProfil -> UserController : getAuthenticatedUser()
-activate UserController
-UserController -> User : findById(auth_id: integer)
-activate User
-User --> UserController : UserData: User
-deactivate User
-UserController --> HalamanProfil : displayProfile(UserData)
-deactivate UserController
-
-Pengguna -> HalamanProfil : Input(UpdateData)
-
 Pengguna -> HalamanProfil : Klik "Simpan Profil"
+activate HalamanProfil
 
-HalamanProfil -> UserController : updateProfile(request: UpdateRequest)
-activate UserController
+HalamanProfil -> UbahProfilController : ubahProfil($request: Request)
+activate UbahProfilController
 
-UserController -> User : validate(request.data)
+UbahProfilController -> UbahProfilController : validate($request: Request)
+UbahProfilController -> User : $user->update($data: Array)
 activate User
-UserController -> User : update(auth_id, request.data)
 
-User --> UserController : UpdatedUser: User
+User -> users : UPDATE users SET ... WHERE id = $user->id
+activate users
+
+users --> User : return(true: Boolean)
+deactivate users
+
+User --> UbahProfilController : return(true: Boolean)
 deactivate User
-    
-UserController --> HalamanProfil : responseSuccess(UpdatedUser)
-deactivate UserController
-    
+
+UbahProfilController --> HalamanProfil : response($data: Array)
+deactivate UbahProfilController
+
+HalamanProfil -> HalamanProfil : authStore.setUser($user)
+
 HalamanProfil -> Pengguna : Tampilkan profil terbaru
 deactivate HalamanProfil
 deactivate Pengguna

@@ -1,31 +1,37 @@
 @startuml SD-UC-B02_MencariProduk
+'MASIH BLM FIX, ASLINYA TIDAK LEWAT BE, HANYA DI FE SAJA
 title Sequence Diagram UC-B02: Mencari Produk
 skinparam style strictuml
 
 actor Pembeli
 boundary HalamanKatalog
-control ProdukController
+control LihatProdukController
 entity Produk
+database produks
 
 activate Pembeli
-Pembeli -> HalamanKatalog : Input(keyword: string)
+Pembeli -> HalamanKatalog : Input keyword pencarian & Enter
 activate HalamanKatalog
 
-Pembeli -> HalamanKatalog : Klik "Cari"
+HalamanKatalog -> LihatProdukController : cariProduk($request: Request)
+activate LihatProdukController
 
-HalamanKatalog -> ProdukController : GET /produk?keyword={keyword}
-activate ProdukController
-
-ProdukController -> Produk : searchByKeyword(keyword: string)
+LihatProdukController -> Produk : Produk::query()->where('status_produk', 'Aktif')
 activate Produk
-Produk --> ProdukController : ProductList: List<Produk>
+
+LihatProdukController -> Produk : $query->where(...) // Filter by Name/Desc/Category
+Produk -> produks : SELECT * FROM produks WHERE ... LIMIT 10 OFFSET 0
+activate produks
+produks --> Produk : return(Result: Paginator)
+deactivate produks
+
+Produk --> LihatProdukController : return(produks: LengthAwarePaginator)
 deactivate Produk
 
-ProdukController --> HalamanKatalog : response(ProductList)
-deactivate ProdukController
+LihatProdukController --> HalamanKatalog : response()->json($produks, 200)
+deactivate LihatProdukController
 
 HalamanKatalog -> Pembeli : Tampilkan hasil pencarian
 deactivate HalamanKatalog
 deactivate Pembeli
-
 @enduml

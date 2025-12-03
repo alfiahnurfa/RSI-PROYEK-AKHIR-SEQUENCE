@@ -5,29 +5,37 @@ skinparam style strictuml
 actor Pembeli
 boundary HalamanKatalog
 boundary HalamanDetailProduk
-control ProdukController
+control LihatProdukController
 entity Produk
+database produks
 
 activate Pembeli
-Pembeli -> HalamanKatalog : Mengakses halaman katalog
+Pembeli -> HalamanKatalog : Klik Card Produk
+
 activate HalamanKatalog
-
-Pembeli -> HalamanKatalog : Klik produk(ID_Produk: integer)
-
-HalamanKatalog -> ProdukController : GET /produk/{ID_Produk}
+HalamanKatalog -> HalamanDetailProduk : navigateTo('/produk/{ID_Produk}')
 deactivate HalamanKatalog
-activate ProdukController
-
-ProdukController -> Produk : findById(ID_Produk: integer)
-activate Produk
-Produk --> ProdukController : ProductData: Produk
-deactivate Produk
-
-ProdukController --> HalamanDetailProduk : response(ProductData)
-deactivate ProdukController
 activate HalamanDetailProduk
 
-HalamanDetailProduk -> Pembeli : Menampilkan seluruh informasi produk lengkap
+HalamanDetailProduk -> LihatProdukController : ambilDetailProduk($id: integer)
+activate LihatProdukController
+
+LihatProdukController -> Produk : Produk::where(id, status_aktif)->first()
+activate Produk
+
+Produk -> produks : SELECT * FROM produks WHERE ...
+activate produks
+
+produks --> Produk : return(produk: Produk)
+deactivate produks
+
+Produk --> LihatProdukController : return(produk: Produk)
+deactivate Produk
+
+LihatProdukController --> HalamanDetailProduk : response($data: Array)
+deactivate LihatProdukController
+
+HalamanDetailProduk -> Pembeli : Tampilkan detail produk tersebut
 deactivate HalamanDetailProduk
 deactivate Pembeli
 
