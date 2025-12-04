@@ -1,46 +1,99 @@
 @startuml SD-UC-G01_MembacaBerita
-title Sequence Diagram UC-G01: Menelusuri dan Membaca Informasi Berita
+title Sequence Diagram UC-G01: Membaca Berita
 skinparam style strictuml
 
 actor Pembeli
 boundary HalamanDaftarBerita
 boundary HalamanDetailBerita
-control BeritaController
+control LihatBeritaController
 entity Berita
+database beritas
 
 activate Pembeli
-Pembeli -> HalamanDaftarBerita : Mengakses halaman berita
+
+Pembeli -> HalamanDaftarBerita : Mengakses '/berita'
 activate HalamanDaftarBerita
 
-HalamanDaftarBerita -> BeritaController : GET /berita
-activate BeritaController
+HalamanDaftarBerita -> LihatBeritaController : ambilDaftarBerita()
+activate LihatBeritaController
 
-BeritaController -> Berita : findPublished()
+LihatBeritaController -> Berita : Berita::where(status='published')
 activate Berita
-Berita --> BeritaController : List Ringkasan Berita: List<Berita>
+
+Berita -> beritas : SELECT * FROM beritas WHERE ...
+activate beritas
+
+beritas --> Berita : return(berita: Array)
+deactivate beritas
+
+Berita --> LihatBeritaController : return(berita: Array)
 deactivate Berita
 
-BeritaController --> HalamanDaftarBerita : response(List Ringkasan Berita)
-deactivate BeritaController
+LihatBeritaController --> HalamanDaftarBerita : response(berita: Array)
+deactivate LihatBeritaController
 
-HalamanDaftarBerita -> Pembeli : Tampilkan daftar ringkasan berita
+HalamanDaftarBerita -> Pembeli : Tampilkan daftar berita
 
-Pembeli -> HalamanDaftarBerita : Memilih berita (ID_Berita: integer)
-HalamanDaftarBerita -> BeritaController : GET /berita/{ID_Berita}
+Pembeli -> HalamanDaftarBerita : Klik card berita
+
+HalamanDaftarBerita -> HalamanDetailBerita : navigateTo('/berita/{id_berita}')
 deactivate HalamanDaftarBerita
-activate BeritaController
-
-BeritaController -> Berita : findById(ID_Berita)
-activate Berita
-Berita --> BeritaController : Data Detail Berita: Berita
-deactivate Berita
-
-BeritaController --> HalamanDetailBerita : response(Data Detail Berita)
-deactivate BeritaController
 activate HalamanDetailBerita
 
-HalamanDetailBerita -> Pembeli : Tampilkan seluruh konten berita
+HalamanDetailBerita -> LihatBeritaController : ambilDetailBerita($id: int)
+activate LihatBeritaController
+
+LihatBeritaController -> Berita : Berita::where($id_berita, first())
+activate Berita
+
+Berita -> beritas : SELECT * FROM beritas WHERE ...
+activate beritas
+
+beritas --> Berita : return(berita: Berita)
+deactivate beritas
+
+Berita --> LihatBeritaController : return(berita: Berita)
+deactivate Berita
+
+LihatBeritaController --> HalamanDetailBerita : response(berita: Berita)
+deactivate LihatBeritaController
+
+HalamanDetailBerita -> Pembeli : Tampilkan detail berita
 deactivate HalamanDetailBerita
-deactivate Pembeli
+
+' activate Pembeli
+' Pembeli -> HalamanDaftarBerita : Mengakses halaman berita
+' activate HalamanDaftarBerita
+
+' HalamanDaftarBerita -> BeritaController : GET /berita
+' activate BeritaController
+
+' BeritaController -> Berita : findPublished()
+' activate Berita
+' Berita --> BeritaController : List Ringkasan Berita: List<Berita>
+' deactivate Berita
+
+' BeritaController --> HalamanDaftarBerita : response(List Ringkasan Berita)
+' deactivate BeritaController
+
+' HalamanDaftarBerita -> Pembeli : Tampilkan daftar ringkasan berita
+
+' Pembeli -> HalamanDaftarBerita : Memilih berita (ID_Berita: integer)
+' HalamanDaftarBerita -> BeritaController : GET /berita/{ID_Berita}
+' deactivate HalamanDaftarBerita
+' activate BeritaController
+
+' BeritaController -> Berita : findById(ID_Berita)
+' activate Berita
+' Berita --> BeritaController : Data Detail Berita: Berita
+' deactivate Berita
+
+' BeritaController --> HalamanDetailBerita : response(Data Detail Berita)
+' deactivate BeritaController
+' activate HalamanDetailBerita
+
+' HalamanDetailBerita -> Pembeli : Tampilkan seluruh konten berita
+' deactivate HalamanDetailBerita
+' deactivate Pembeli
 
 @enduml

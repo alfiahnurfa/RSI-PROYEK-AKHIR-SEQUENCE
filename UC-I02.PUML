@@ -1,34 +1,38 @@
 @startuml SD-UC-IO2_UpdateStatusPesanan
-title Sequence Diagram UC-I02: Memperbarui Status Pesanan Pembeli
+title Sequence Diagram UC-I02: Memperbarui Status
 skinparam style strictuml
 
 actor Admin
 boundary HalamanPesananAdmin
-control PesananController
+control UbahPesananController
 entity Pesanan
+database pesanans
 
 activate Admin
-Admin -> HalamanPesananAdmin : Mengakses halaman "/admin/pesanan"
+
+Admin -> HalamanPesananAdmin : Klik "Konfirmasi" / "Kirim Pesanan" / "Selesaikan"
 activate HalamanPesananAdmin
 
-HalamanPesananAdmin -> Admin : Tampilkan daftar pesanan
+HalamanPesananAdmin -> UbahPesananController : updateStatus(request: Request, id: int)
+activate UbahPesananController
 
-Admin -> HalamanPesananAdmin : Pilih dan Simpan Status Baru (status: string)
-
-HalamanPesananAdmin -> PesananController : PATCH /admin/pesanan/{ID_Pesanan} (request: object)
-activate PesananController
-
-PesananController -> Pesanan : validate(request.data)
+UbahPesananController -> UbahPesananController : validate($request)
+UbahPesananController -> Pesanan : Pesanan::where(id_pesanan).update(status_pesanan: string)
 activate Pesanan
 
-PesananController -> Pesanan : updateStatus(ID_Pesanan, request.status)
-Pesanan --> PesananController : updateStatus: boolean
+Pesanan -> pesanans : UPDATE pesanans SET ...
+activate pesanans
+
+pesanans --> Pesanan : return(pesanan: Pesanan)
+deactivate pesanans
+
+Pesanan --> UbahPesananController : return(pesanan: Pesanan)
 deactivate Pesanan
 
-PesananController --> HalamanPesananAdmin : responseSuccess(message: string)
-deactivate PesananController
+UbahPesananController --> HalamanPesananAdmin : response(data: Array)
+deactivate UbahPesananController
 
-HalamanPesananAdmin -> Admin : Tampilkan notifikasi sukses dan muat ulang daftar
+HalamanPesananAdmin -> Admin : Tampilkan perubahan status
 deactivate HalamanPesananAdmin
 deactivate Admin
 

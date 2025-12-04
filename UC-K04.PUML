@@ -1,52 +1,45 @@
 @startuml SD-UC-K04_PerbaruiBerita
-title Sequence Diagram UC-K04: Memperbarui Konten Berita (Admin)
+title Sequence Diagram UC-K04: Memperbarui Berita (Admin)
 skinparam style strictuml
 
 actor Admin
 boundary HalamanDaftarBerita
-boundary HalamanFormEditBerita
-control BeritaController
+boundary HalamanUbahBerita
+control UbahBeritaController
 entity Berita
+database beritas
 
 activate Admin
-Admin -> HalamanDaftarBerita : Mengakses halaman "/admin/berita"
+
+Admin -> HalamanUbahBerita : Klik "Perbarui Berita"
+activate HalamanUbahBerita
+
+HalamanUbahBerita -> UbahBeritaController : ubahBerita(request: Request, id_berita: int)
+activate UbahBeritaController
+
+UbahBeritaController -> UbahBeritaController : validate(request: Request)
+UbahBeritaController -> Berita : Berita::where(id_berita).update(data: Array)
+activate Berita
+
+Berita -> beritas : UPDATE beritas SET ...
+activate beritas
+
+beritas --> Berita : return(berita: Berita)
+deactivate beritas
+
+Berita --> UbahBeritaController : return(berita: Berita)
+deactivate Berita
+
+UbahBeritaController --> HalamanUbahBerita : response(data: Array)
+deactivate UbahBeritaController
+
+HalamanUbahBerita --> Admin : Tampilkan notifikasi berhasil
+HalamanUbahBerita -> HalamanDaftarBerita : router.push('/admin/berita')
+deactivate HalamanUbahBerita
 activate HalamanDaftarBerita
 
-HalamanDaftarBerita -> Admin : Tampilkan daftar berita
-
-Admin -> HalamanDaftarBerita : Klik "Edit" (ID_Berita: integer)
-HalamanDaftarBerita -> BeritaController : GET /admin/berita/{ID_Berita}
+HalamanDaftarBerita -> Admin : Tampilkan daftar berita terbaru
 deactivate HalamanDaftarBerita
-activate BeritaController
-
-BeritaController -> Berita : findById(ID_Berita: integer)
-activate Berita
-Berita --> BeritaController : DataKonten: Berita
-deactivate Berita
-
-BeritaController -> HalamanFormEditBerita : response(DataKonten)
-deactivate BeritaController
-activate HalamanFormEditBerita
-
-Admin -> HalamanFormEditBerita : Melakukan perubahan konten
-
-Admin -> HalamanFormEditBerita : Klik "Perbarui"
-
-HalamanFormEditBerita -> BeritaController : PUT /admin/berita/{ID_Berita} (request: object)
-activate BeritaController
-
-BeritaController -> Berita : validate(request.data)
-activate Berita
-
-BeritaController -> Berita : update(ID_Berita, request.data)
-Berita --> BeritaController : UpdateStatus: boolean
-deactivate Berita
-
-BeritaController --> HalamanFormEditBerita : responseSuccess(message: string)
-deactivate BeritaController
-
-HalamanFormEditBerita -> Admin : Tampilkan notifikasi sukses dan redirect
-deactivate HalamanFormEditBerita
 deactivate Admin
 
 @enduml

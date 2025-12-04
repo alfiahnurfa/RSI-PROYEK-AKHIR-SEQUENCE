@@ -4,25 +4,34 @@ skinparam style strictuml
 
 actor Admin
 boundary HalamanKelolaProduk
-control ProdukController
+control LihatProdukController
 entity Produk
+database produks
 
 activate Admin
-Admin -> HalamanKelolaProduk : Mengakses halaman "/admin/produk"
+
+Admin -> HalamanKelolaProduk : Mengakses halaman '/admin/produk'
 activate HalamanKelolaProduk
 
-HalamanKelolaProduk -> ProdukController : GET /admin/produk
-activate ProdukController
+HalamanKelolaProduk -> LihatProdukController : ambilSemuaProduk()
+activate LihatProdukController
 
-ProdukController -> Produk : findAll()
+LihatProdukController -> Produk : Produk::all()
 activate Produk
-Produk --> ProdukController : ProductList: List<Produk>
+
+Produk -> produks : SELECT * FROM produks
+activate produks
+
+produks --> Produk : return(produk: Array)
+deactivate produks
+
+Produk --> LihatProdukController : return(produk: Array)
 deactivate Produk
 
-ProdukController --> HalamanKelolaProduk : response(ProductList)
-deactivate ProdukController
-
-HalamanKelolaProduk -> Admin : Tampilkan daftar produk dan opsi aksi
+LihatProdukController --> HalamanKelolaProduk : response($data: Array)
+deactivate LihatProdukController
+    
+HalamanKelolaProduk -> Admin : Tampilkan daftar produk
 deactivate HalamanKelolaProduk
 deactivate Admin
 

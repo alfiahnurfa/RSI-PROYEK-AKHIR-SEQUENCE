@@ -3,31 +3,43 @@ title Sequence Diagram UC-F01: Mengirim Laporan Pengaduan Produk
 skinparam style strictuml
 
 actor Pembeli
-boundary HalamanDetailPesanan
-control KomplainController
+boundary HalamanAduan
+boundary HalamanTransaksi
+control TambahKomplainController
 entity Komplain
+database komplains
 
 activate Pembeli
-Pembeli -> HalamanDetailPesanan : Mengakses halaman detail pesanan
-activate HalamanDetailPesanan
+Pembeli -> HalamanAduan : Klik "Kirim Aduan"
+activate HalamanAduan
 
-Pembeli -> HalamanDetailPesanan : Input dan Submit(Data Pengaduan)
-
-HalamanDetailPesanan -> KomplainController : POST /komplain (request: object)
+HalamanAduan -> KomplainController : kirimAduan($request: Request)
 activate KomplainController
 
-KomplainController -> Komplain : validate(request.data)
+KomplainController -> KomplainController : validate($request)
+
+KomplainController -> Komplain : create($data: Array)
 activate Komplain
 
-KomplainController -> Komplain : create(request.data)
-Komplain --> KomplainController : KomplainData: Komplain
+Komplain -> komplains : INSERT INTO komplains ...
+activate komplains
+
+komplains --> Komplain : return(komplain: Komplain)
+deactivate komplains
+
+Komplain --> KomplainController : return(komplain: Komplain)
 deactivate Komplain
 
-KomplainController --> HalamanDetailPesanan : responseSuccess(message: string)
+KomplainController --> HalamanAduan : response(data: Array)
 deactivate KomplainController
 
-HalamanDetailPesanan -> Pembeli : Tampilkan notifikasi sukses
-deactivate HalamanDetailPesanan
+HalamanAduan --> Pembeli : Tampilkan notifikasi sukses
+HalamanAduan -> HalamanTransaksi : navigateTio('/transaksi')
+deactivate HalamanAduan
+activate HalamanTransaksi
+
+HalamanTransaksi -> Pembeli : Tampilkan halaman transaksi
+deactivate HalamanTransaksi
 deactivate Pembeli
 
 @enduml

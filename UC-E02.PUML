@@ -3,31 +3,41 @@ title Sequence Diagram UC-E02: Melihat Detail Pesanan
 skinparam style strictuml
 
 actor Pembeli
-boundary HalamanTransaksi as "Halaman Transaksi Saya"
-boundary HalamanDetailPesanan
-control PesananController
+boundary HalamanTransaksi
+boundary HalamanDetailTransaksi
+control LihatPesananController
 entity Pesanan
+database pesanans
 
 activate Pembeli
-Pembeli -> HalamanTransaksi : Mengakses riwayat pesanan
+
+Pembeli -> HalamanTransaksi : Klik Card Transaksi
 activate HalamanTransaksi
 
-Pembeli -> HalamanTransaksi : Mengklik detail pesanan (ID_Pesanan: integer)
-HalamanTransaksi -> PesananController : GET /pesanan/{ID_Pesanan}
+HalamanTransaksi -> HalamanDetailTransaksi : navigateTo('/transaksi/{id_pesanan}')
 deactivate HalamanTransaksi
+activate HalamanDetailTransaksi
+
+HalamanDetailTransaksi -> PesananController : ambilDetailPesanan($id: int)
 activate PesananController
 
-PesananController -> Pesanan : findDetailById(ID_Pesanan)
+PesananController -> Pesanan : Pesanan::where(id_pembeli, id_pesanan, first())
 activate Pesanan
-Pesanan --> PesananController : Data Pesanan Lengkap: Pesanan
+
+Pesanan -> pesanans : SELECT * FROM pesanans WHERE ...
+activate pesanans
+
+pesanans --> Pesanan : return(pesanan: Pesanan)
+deactivate pesanans
+
+Pesanan --> PesananController : return(pesanan: Pesanan)
 deactivate Pesanan
 
-PesananController --> HalamanDetailPesanan : response(Data Pesanan Lengkap)
+PesananController --> HalamanDetailTransaksi : response($data: Array)
 deactivate PesananController
-activate HalamanDetailPesanan
 
-HalamanDetailPesanan -> Pembeli : Meninjau detail pesanan
-deactivate HalamanDetailPesanan
+HalamanDetailTransaksi -> Pembeli : Tampilkan halaman detail pesanan
+deactivate HalamanDetailTransaksi
 deactivate Pembeli
 
 @enduml

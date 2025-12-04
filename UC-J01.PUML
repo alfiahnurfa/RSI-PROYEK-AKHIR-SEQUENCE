@@ -3,43 +3,61 @@ title Sequence Diagram UC-J01: Melihat Komplain Produk (Admin)
 skinparam style strictuml
 
 actor Admin
-boundary HalamanPusatPengaduan
+boundary HalamanDaftarPengaduan
 boundary HalamanDetailKomplain
-control KomplainController
+control LihatKomplainController
 entity Komplain
+database komplains
 
 activate Admin
-Admin -> HalamanPusatPengaduan : Mengakses halaman "/admin/aduan"
-activate HalamanPusatPengaduan
 
-HalamanPusatPengaduan -> KomplainController : GET /admin/komplain
-activate KomplainController
+Admin -> HalamanDaftarPengaduan : Mengakses halaman "/admin/aduan"
+activate HalamanDaftarPengaduan
 
-KomplainController -> Komplain : findAll()
+HalamanDaftarPengaduan -> LihatKomplainController : ambilDaftarKomplain($request: Request)
+activate LihatKomplainController
+
+LihatKomplainController -> Komplain : Komplain::all()
 activate Komplain
-Komplain --> KomplainController : List Ringkasan Komplain: List<Komplain>
+
+Komplain -> komplains : SELECT * FROM komplains
+activate komplains
+
+komplains --> Komplain : return(komplains: Array)
+deactivate komplains
+
+Komplain --> LihatKomplainController : return(komplains: Array)
 deactivate Komplain
 
-KomplainController --> HalamanPusatPengaduan : response(List Ringkasan Komplain)
-deactivate KomplainController
+LihatKomplainController --> HalamanDaftarPengaduan : response(komplains: Array)
+deactivate LihatKomplainController
 
-HalamanPusatPengaduan -> Admin : Tampilkan daftar ringkasan pengaduan
+HalamanDaftarPengaduan -> Admin : Tampilkan daftar pengaduan
+Admin -> HalamanDaftarPengaduan : Klik 'Lihat Detail' pada salah 1 pengaduan
 
-Admin -> HalamanPusatPengaduan : Klik laporan (ID_Komplain: integer)
-
-HalamanPusatPengaduan -> KomplainController : GET /admin/komplain/{ID_Komplain}
-activate KomplainController
-
-KomplainController -> Komplain : findById(ID_Komplain: integer)
-activate Komplain
-Komplain --> KomplainController : Data Detail Komplain: Komplain
-deactivate Komplain
-
-KomplainController --> HalamanDetailKomplain : response(Data Detail Komplain)
-deactivate KomplainController
+HalamanDaftarPengaduan -> HalamanDetailKomplain : navigateTo('/admin/aduan/{id_komplain}')
+deactivate HalamanDaftarPengaduan
 activate HalamanDetailKomplain
 
-HalamanDetailKomplain -> Admin : Melihat dan meninjau detail laporan
+HalamanDetailKomplain -> LihatKomplainController : ambilDetailKomplain($id: int)
+activate LihatKomplainController
+
+LihatKomplainController -> Komplain : Komplain::where(id_komplain, first())
+activate Komplain
+
+Komplain -> komplains : SELECT * FROM komplains WHERE ...
+activate komplains
+
+komplains --> Komplain : return(komplain: Komplain)
+deactivate komplains
+
+Komplain --> LihatKomplainController : return(komplain: Komplain)
+deactivate Komplain
+
+LihatKomplainController --> HalamanDetailKomplain : response(data: Array)
+deactivate LihatKomplainController
+
+HalamanDetailKomplain -> Admin : Tampilkan detail pengaduan
 deactivate HalamanDetailKomplain
 deactivate Admin
 

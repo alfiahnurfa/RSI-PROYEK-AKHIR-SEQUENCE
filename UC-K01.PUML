@@ -3,27 +3,33 @@ title Sequence Diagram UC-K01: Melihat Daftar Berita (Admin)
 skinparam style strictuml
 
 actor Admin
-boundary HalamanDaftarBerita
-control BeritaController
+boundary HalamanKelolaBerita
+control LihatSemuaBeritaController
 entity Berita
+database beritas
 
-activate Admin
-Admin -> HalamanDaftarBerita : Mengakses halaman "/admin/berita"
-activate HalamanDaftarBerita
 
-HalamanDaftarBerita -> BeritaController : GET /admin/berita
-activate BeritaController
+Admin -> HalamanKelolaBerita : Mengakses '/admin/berita'
+activate HalamanKelolaBerita
 
-BeritaController -> Berita : findAll()
+HalamanKelolaBerita -> LihatSemuaBeritaController : ambilDaftarBerita()
+activate LihatSemuaBeritaController
+
+LihatSemuaBeritaController -> Berita : Berita::all()
 activate Berita
-Berita --> BeritaController : List Berita Lengkap: List<Berita>
+
+Berita -> beritas : SELECT * FROM beritas
+activate beritas
+
+beritas --> Berita : return(berita: Array)
+deactivate beritas
+
+Berita --> LihatSemuaBeritaController : return(berita: Array)
 deactivate Berita
 
-BeritaController --> HalamanDaftarBerita : response(List Berita Lengkap)
-deactivate BeritaController
-    
-HalamanDaftarBerita -> Admin : Melihat dan meninjau daftar berita
-deactivate HalamanDaftarBerita
-deactivate Admin
+LihatSemuaBeritaController --> HalamanKelolaBerita : response(berita: Array)
+deactivate LihatSemuaBeritaController
+
+HalamanKelolaBerita -> Admin : Tampilkan daftar berita
 
 @enduml

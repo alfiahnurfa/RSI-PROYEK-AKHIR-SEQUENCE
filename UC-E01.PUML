@@ -3,24 +3,33 @@ title Sequence Diagram UC-E01: Melihat Daftar Seluruh Pesanan
 skinparam style strictuml
 
 actor Pembeli
-boundary HalamanTransaksi as "Halaman Transaksi Saya"
-control PesananController
+boundary HalamanTransaksi
+control LihatPesananController
 entity Pesanan
+database pesanans
 
 activate Pembeli
+
 Pembeli -> HalamanTransaksi : Mengakses halaman "/dashboard/transaksi"
 activate HalamanTransaksi
 
-HalamanTransaksi -> PesananController : GET /pesanan
-activate PesananController
+HalamanTransaksi -> LihatPesananController : ambilDaftarPesanan($request: Request)
+activate LihatPesananController
 
-PesananController -> Pesanan : findByUserId(auth_id)
+LihatPesananController -> Pesanan : Pesanan::where('user_id', auth_id)
 activate Pesanan
-Pesanan --> PesananController : List Ringkasan Pesanan: List<Pesanan>
+
+Pesanan -> pesanans : SELECT * FROM pesanans WHERE ...
+activate pesanans
+
+pesanans --> Pesanan : return(pesanan: Array)
+deactivate pesanans
+
+Pesanan --> LihatPesananController : return(pesanan: Array)
 deactivate Pesanan
 
-PesananController --> HalamanTransaksi : response(List Pesanan)
-deactivate PesananController
+LihatPesananController --> HalamanTransaksi : response($data: Array)
+deactivate LihatPesananController
 
 HalamanTransaksi -> Pembeli : Tampilkan daftar ringkasan pesanan
 deactivate HalamanTransaksi

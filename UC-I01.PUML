@@ -1,28 +1,37 @@
 @startuml SD-UC-I01_MelihatDaftarPesananAdmin
-title Sequence Diagram UC-I01: Melihat Daftar Pesanan yang Masuk (Admin)
+title Sequence Diagram UC-I01: Melihat Daftar Pesanan (Admin)
 skinparam style strictuml
 
 actor Admin
 boundary HalamanDaftarPesanan
-control PesananController
+control LihatSemuaPesananController
 entity Pesanan
+database pesanans
 
 activate Admin
+
 Admin -> HalamanDaftarPesanan : Mengakses halaman "/admin/pesanan"
 activate HalamanDaftarPesanan
 
-HalamanDaftarPesanan -> PesananController : GET /admin/pesanan
-activate PesananController
+HalamanDaftarPesanan -> LihatSemuaPesananController : ambilSemuaPesanan()
+activate LihatSemuaPesananController
 
-PesananController -> Pesanan : findAll()
+LihatSemuaPesananController -> Pesanan : Pesanan::all()
 activate Pesanan
-Pesanan --> PesananController : List Pesanan Lengkap: List<Pesanan>
+
+Pesanan -> pesanans : SELECT * FROM pesanans
+activate pesanans
+
+pesanans --> Pesanan : return(pesanan: Array)
+deactivate pesanans
+
+Pesanan --> LihatSemuaPesananController : return(pesanan: Array)
 deactivate Pesanan
 
-PesananController --> HalamanDaftarPesanan : response(List Pesanan)
-deactivate PesananController
+LihatSemuaPesananController --> HalamanDaftarPesanan : response(pesanan: Array)
+deactivate LihatSemuaPesananController
 
-HalamanDaftarPesanan -> Admin : Melihat dan meninjau daftar pesanan
+HalamanDaftarPesanan -> Admin : Tampilkan daftar pesanan
 deactivate HalamanDaftarPesanan
 deactivate Admin
 

@@ -4,33 +4,40 @@ skinparam style strictuml
 
 actor Admin
 boundary HalamanTambahProduk
-control ProdukController
+control TambahProdukController
 entity Produk
+database produks
 
 activate Admin
-Admin -> HalamanTambahProduk : Mengakses halaman "/admin/produk/tambah"
+
+Admin -> HalamanTambahProduk : Mengakses halaman '/admin/produk/tambah'
 activate HalamanTambahProduk
 
 HalamanTambahProduk -> Admin : Tampilkan formulir input produk
-
 Admin -> HalamanTambahProduk : Mengisi data produk lengkap
-
 Admin -> HalamanTambahProduk : Klik "Tambahkan"
 
-HalamanTambahProduk -> ProdukController : POST /admin/produk (request: object)
-activate ProdukController
+HalamanTambahProduk -> TambahProdukController : tambahProduk(request: Request)
+activate TambahProdukController
 
-ProdukController -> Produk : validate(request.data)
+TambahProdukController -> TambahProdukController : validate($request)
+
+TambahProdukController -> Produk : Produk::create($data: Array)
 activate Produk
 
-ProdukController -> Produk : create(request.data)
-Produk --> ProdukController : NewProduct: Produk
+Produk -> produks : INSERT INTO produks ...
+activate produks
+
+produks --> Produk : return(produk: Produk)
+deactivate produks
+
+Produk --> TambahProdukController : return(produk: Produk)
 deactivate Produk
 
-ProdukController --> HalamanTambahProduk : responseSuccess(NewProduct)
-deactivate ProdukController
+TambahProdukController --> HalamanTambahProduk : response(produk: Produk)
+deactivate TambahProdukController
 
-HalamanTambahProduk -> Admin : Tampilkan notifikasi dan redirect ke daftar produk
+HalamanTambahProduk -> Admin : Tampilkan notifikasi berhasil
 deactivate HalamanTambahProduk
 deactivate Admin
 

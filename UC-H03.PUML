@@ -4,29 +4,34 @@ skinparam style strictuml
 
 actor Admin
 boundary HalamanKelolaProduk
-control ProdukController
+control HapusProdukController
 entity Produk
+database produks
 
 activate Admin
-Admin -> HalamanKelolaProduk : Mengakses halaman kelola produk
+
+Admin -> HalamanKelolaProduk : Klik "Hapus" 
 activate HalamanKelolaProduk
 
-HalamanKelolaProduk -> Admin : Tampilkan daftar seluruh produk
+HalamanKelolaProduk -> HapusProdukController : hapusProduk(id_produk: integer)
+activate HapusProdukController
 
-Admin -> HalamanKelolaProduk : Klik "Hapus" (ID_Produk: integer)
-
-HalamanKelolaProduk -> ProdukController : DELETE /admin/produk/{ID_Produk}
-activate ProdukController
-
-ProdukController -> Produk : deleteById(ID_Produk: integer)
+HapusProdukController -> Produk : Produk::deleteById(id_produk: integer)
 activate Produk
-Produk --> ProdukController : deleteStatus: boolean
+
+Produk -> produks : DELETE FROM produks WHERE id_produk = ...
+activate produks
+
+produks --> Produk : return(true: boolean)
+deactivate produks
+
+Produk --> HapusProdukController : return(true: boolean)
 deactivate Produk
 
-ProdukController --> HalamanKelolaProduk : responseSuccess(message: string)
-deactivate ProdukController
+HapusProdukController --> HalamanKelolaProduk : response(data: Array)
+deactivate HapusProdukController
 
-HalamanKelolaProduk -> Admin : Tampilkan notifikasi sukses dan daftar terbaru
+HalamanKelolaProduk -> Admin : Tampilkan notifikasi & list baru
 deactivate HalamanKelolaProduk
 deactivate Admin
 

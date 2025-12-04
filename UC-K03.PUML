@@ -3,31 +3,36 @@ title Sequence Diagram UC-K03: Menghapus Berita (Admin)
 skinparam style strictuml
 
 actor Admin
-boundary HalamanDaftarBerita
-control BeritaController
+boundary HalamanKelolaBerita
+control HapusBeritaController
 entity Berita
+database beritas
 
 activate Admin
-Admin -> HalamanDaftarBerita : Mengakses halaman "/admin/berita"
-activate HalamanDaftarBerita
 
-HalamanDaftarBerita -> Admin : Tampilkan daftar berita
+Admin -> HalamanKelolaBerita : Klik "Hapus"
+activate HalamanKelolaBerita
 
-Admin -> HalamanDaftarBerita : Klik "Hapus" (ID_Berita: integer)
+HalamanKelolaBerita -> HapusBeritaController : hapusBerita(id_berita: int)
+activate HapusBeritaController
 
-HalamanDaftarBerita -> BeritaController : DELETE /admin/berita/{ID_Berita}
-activate BeritaController
-    
-BeritaController -> Berita : deleteById(ID_Berita: integer)
+HapusBeritaController -> Berita : Berita::deleteById(id_berita: int)
 activate Berita
-Berita --> BeritaController : deleteStatus: boolean
+
+Berita -> beritas : DELETE FROM beritas WHERE id_berita = ...
+activate beritas
+
+beritas --> Berita : return(true: boolean)
+deactivate beritas
+
+Berita --> HapusBeritaController : return(true: boolean)
 deactivate Berita
-    
-BeritaController --> HalamanDaftarBerita : responseSuccess(message: string)
-deactivate BeritaController
-    
-HalamanDaftarBerita -> Admin : Tampilkan notifikasi sukses dan daftar terbaru
-deactivate HalamanDaftarBerita
+
+HapusBeritaController --> HalamanKelolaBerita : response(data: Array)
+deactivate HapusBeritaController
+
+HalamanKelolaBerita -> Admin : Tampilkan notifikasi & daftar berita baru
+deactivate HalamanKelolaBerita
 deactivate Admin
 
 @enduml

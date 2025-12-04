@@ -3,32 +3,41 @@ title Sequence Diagram UC-H05: Memperbarui Stok Produk
 skinparam style strictuml
 
 actor Admin
+boundary HalamanUbahProduk
 boundary HalamanKelolaProduk
-control ProdukController
+control UbahProdukController
 entity Produk
+database produks
 
 activate Admin
-Admin -> HalamanKelolaProduk : Mengakses halaman "/admin/produk"
-activate HalamanKelolaProduk
 
-HalamanKelolaProduk -> Admin : Tampilkan daftar produk beserta field stok
+Admin -> HalamanUbahProduk : Klik "Perbarui Produk"
+activate HalamanUbahProduk
 
-Admin -> HalamanKelolaProduk : Edit nilai stok baru
+HalamanUbahProduk -> UbahProdukController : ubahProduk(request: Request, id: int)
+activate UbahProdukController
 
-HalamanKelolaProduk -> ProdukController : PATCH /admin/produk/{ID_Produk} (request: {stok: integer})
-activate ProdukController
-
-ProdukController -> Produk : validate(request.data)
+UbahProdukController -> Produk : Produk::where(id_produk).update(stok: integer)
 activate Produk
 
-ProdukController -> Produk : updateStock(ID_Produk, New_Stock_Value)
-Produk --> ProdukController : updateStatus: boolean
+Produk -> produks : UPDATE produks SET stok = ... WHERE id_produk = ...
+activate produks
+
+produks --> Produk : return(produk: Produk)
+deactivate produks
+
+Produk --> UbahProdukController : return(produk: Produk)
 deactivate Produk
 
-ProdukController --> HalamanKelolaProduk : responseSuccess(message: string)
-deactivate ProdukController
+UbahProdukController --> HalamanUbahProduk : response(produk: Produk)
+deactivate UbahProdukController
 
-HalamanKelolaProduk -> Admin : Tampilkan notifikasi sukses dan nilai stok terbaru
+HalamanUbahProduk -> Admin : Tampilkan notifikasi berhasil
+HalamanUbahProduk -> HalamanKelolaProduk : navigateTo('/admin/produk')
+deactivate HalamanUbahProduk
+activate HalamanKelolaProduk
+
+HalamanKelolaProduk -> Admin : Tampilkan daftar produk terbaru
 deactivate HalamanKelolaProduk
 deactivate Admin
 

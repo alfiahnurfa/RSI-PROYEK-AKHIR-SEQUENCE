@@ -4,29 +4,34 @@ skinparam style strictuml
 
 actor Admin
 boundary HalamanKelolaProduk
-control ProdukController
+control UbahProdukController
 entity Produk
+database produks
 
 activate Admin
-Admin -> HalamanKelolaProduk : Mengakses halaman "/admin/produk"
+
+Admin -> HalamanKelolaProduk : Klik "Arsipkan"
 activate HalamanKelolaProduk
 
-HalamanKelolaProduk -> Admin : Tampilkan daftar seluruh produk
+HalamanKelolaProduk -> UbahProdukController : ubahProduk(request: Request, id: int)
+activate UbahProdukController
 
-Admin -> HalamanKelolaProduk : Klik "Arsipkan" (ID_Produk: integer)
-
-HalamanKelolaProduk -> ProdukController : PATCH /admin/produk/{ID_Produk} (request: {status: 'Arsip'})
-activate ProdukController
-
-ProdukController -> Produk : updateStatus(ID_Produk, 'Arsip')
+UbahProdukController -> Produk : Produk::where(id_produk).update(status_produk: 'Arsip')
 activate Produk
-Produk --> ProdukController : updateStatus: boolean
+
+Produk -> produks : UPDATE produks SET status_produk = 'Arsip' WHERE id_produk = ...
+activate produks
+
+produks --> Produk : return(true: boolean)
+deactivate produks
+
+Produk --> UbahProdukController : return(true: boolean)
 deactivate Produk
 
-ProdukController --> HalamanKelolaProduk : responseSuccess(message: string)
-deactivate ProdukController
+UbahProdukController --> HalamanKelolaProduk : response(data: Array)
+deactivate UbahProdukController
 
-HalamanKelolaProduk -> Admin : Tampilkan notifikasi sukses dan daftar terbaru
+HalamanKelolaProduk -> Admin : Tampilkan notifikasi & list baru
 deactivate HalamanKelolaProduk
 deactivate Admin
 

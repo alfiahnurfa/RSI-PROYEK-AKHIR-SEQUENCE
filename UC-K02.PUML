@@ -1,42 +1,44 @@
 @startuml SD-UC-K02_TambahBerita
-title Sequence Diagram UC-K02: Menambahkan Berita Baru (Admin)
+title Sequence Diagram UC-K02: Menambahkan Berita (Admin)
 skinparam style strictuml
 
 actor Admin
-boundary HalamanDaftarBerita
-boundary HalamanFormBerita
-control BeritaController
+boundary HalamanKelolaBerita
+boundary HalamanTambahBerita
+control TambahBeritaController
 entity Berita
+database beritas
 
 activate Admin
-Admin -> HalamanDaftarBerita : Mengakses halaman daftar berita
-activate HalamanDaftarBerita
 
-Admin -> HalamanDaftarBerita : Klik "Tambah Berita"
-deactivate HalamanDaftarBerita
+Admin -> HalamanTambahBerita : Klik "Tambahkan"
+activate HalamanTambahBerita
 
-HalamanFormBerita -> Admin : Tampilkan formulir penambahan berita
-activate HalamanFormBerita
+HalamanTambahBerita -> TambahBeritaController : tambahBerita(request: Request)
+activate TambahBeritaController
 
-Admin -> HalamanFormBerita : Mengisi informasi berita
-
-Admin -> HalamanFormBerita : Klik "Terbitkan"
-
-HalamanFormBerita -> BeritaController : POST /admin/berita (request: object)
-activate BeritaController
-
-BeritaController -> Berita : validate(request.data)
+TambahBeritaController -> TambahBeritaController : validate($request: Request)
+TambahBeritaController -> Berita : Berita::create(data: Array)
 activate Berita
 
-BeritaController -> Berita : create(request.data, status: 'Terbit')
-Berita --> BeritaController : NewBerita: Berita
+Berita -> beritas : INSERT INTO beritas ...
+activate beritas
+
+beritas --> Berita : return(berita: Berita)
+deactivate beritas
+
+Berita --> TambahBeritaController : return(berita: Berita)
 deactivate Berita
-    
-BeritaController --> HalamanFormBerita : responseSuccess(message: string)
-deactivate BeritaController
-    
-HalamanFormBerita -> Admin : Tampilkan notifikasi sukses dan redirect
-deactivate HalamanFormBerita
+
+TambahBeritaController --> HalamanTambahBerita : response(data: Array)
+deactivate TambahBeritaController
+
+HalamanTambahBerita -> HalamanKelolaBerita : navigateTo('/admin/berita')
+deactivate HalamanTambahBerita
+activate HalamanKelolaBerita
+
+HalamanKelolaBerita -> Admin : Tampilkan daftar berita
+deactivate HalamanKelolaBerita
 deactivate Admin
 
 @enduml
