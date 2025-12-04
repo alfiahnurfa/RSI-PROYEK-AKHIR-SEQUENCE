@@ -62,47 +62,123 @@ class Berita {
   + tanggal_publikasi : DateTime
 }
 
-' ---------------------------------
-' Kelas Controller (Logika Bisnis)
-' ---------------------------------
-class UserController {
-  + daftarPengguna() : array
-  + masuk(email: string, pass: string) : User
-  + ambilProfil(id: int) : User
-  + ubahProfil(id: int, data: array) : bool
-  + ubahKataSandi(id: int, newPass: string) : bool
-  + logout() : void
+' sisi pengguna
+
+' auth
+class LoginController {
+  + masuk(request: Request)
 }
 
-class ProdukController {
-  + ambilSemuaProduk() : array
-  + cariProduk(keyword: string) : array
-  + ambilDetailProduk(id: int) : Produk
-  + tambahProduk(data: array) : bool
-  + ubahProduk(id: int, data: array) : bool
-  + hapusProduk(id: int) : bool
+class LogoutController {
+  + logout(request: Request)
 }
 
-class PesananController {
-  + ambilDetailPesanan(id: int) : Pesanan
-  + buatPesanan(userId: int, cartItems: array) : bool
-  + ambilDaftarPesanan(userId: int) : array
-  + ambilSemuaPesanan() : array
-  + perbaruiStatusPesanan(id: int, status: string) : bool
+class RegisterController {
+  + daftarPengguna(request: Request)
 }
 
-class KomplainController {
-  + ajukanKomplain(data: array) : bool
-  + ambilDaftarKomplain() : array
-  + ambilDetailKomplain(id: int) : Komplain
+' profil
+class LihatProfilController {
+  + ambilProfil(request: Request)
 }
 
-class BeritaController {
-  + ambilDaftarBerita() : array
-  + ambilDetailBerita(id: int) : Berita
-  + tambahBerita(data: array) : bool
-  + hapusBerita(id: int) : bool
-  + ubahBerita(id: int, data: array) : bool
+class UbahKataSandiController {
+  + ubahKataSandi(request: Request)
+}
+
+class UbahProfilController {
+  + ubahProfil(request: Request)
+}
+
+' produk
+class LihatProdukController {
+  + ambilSemuaProduk(request: Request)
+  + ambilProdukTerlaris()
+  + ambilDetailProduk(id: int)
+  + cariProduk(request: request)
+
+}
+
+' pesanan
+class LihatPesananController {
+  + ambilDaftarPesanan(request: Request)
+  + ambilDetailPesanan(id: int)
+}
+
+class TambahPesananController {
+  + buatPesanan(request: Request)
+}
+
+' pembayaran
+class BatalkanPembayaranController {
+  + batalkanPesanan(request: Request, id_pesanan: int)
+}
+
+class KonfirmasiPembayaranController {
+  + perbaruiStatusPembayaran(request: Request, id_pesanan: int)
+}
+
+class LihatDetailPembayaranController {
+  + ambilDetailPembayaran(request: Request, id_pesanan: int)
+}
+
+' komplain
+class TambahKomplainController {
+  + ajukanKomplain(request: Request, id_pesanan: int)
+}
+
+' berita
+class LihatBeritaController {
+ + ambilDaftarBerita(request: Request)
+ + ambilBeritaTerkini(request: Request)
+ + ambilDetailBerita(id_berita: int)
+}
+
+' sisi admin
+
+' produk
+class HapusProdukController {
+  + hapusProduk(id: int)
+}
+
+class TambahProdukController {
+  + tambahProduk(request: Request)
+}
+
+class UbahProdukController {
+  + ubahProduk(request: Request, id: int)
+}
+
+' pesanan
+class LihatSemuaPesananController {
+  + ambilSemuaPesanan(request: Request)
+}
+
+class UbahPesananController {
+  + perbaruiStatusPesanan(request: Request, id_pesanan: int)
+}
+
+' komplain
+class LihatKomplainController {
+  + ambilDaftarKomplain(request: Request)
+  + ambilDetailKomplain(id_komplain: int)
+}
+
+class UbahKomplainController {
+  + perbaruiStatusKomplain(request: Request, id_komplain: int)
+}
+
+' berita 
+class HapusBeritaContoller {
+  + hapusBerita(id_berita: int)
+}
+
+class TambahBeritaController {
+  + tambahBerita(request: Request)
+}
+
+class UbahBeritaController {
+  + ubahBerita(request: Request, id_berita: int)
 }
 
 ' ---------------------------------
@@ -118,18 +194,43 @@ Pesanan "1" -- "0..1" Komplain : memiliki >
 
 ' ---------------------------------
 ' Hubungan Controller-Model (Dependensi)
-' Diperbarui: PesananController menggunakan Pesanan dan DetailPesanan
 ' ---------------------------------
-UserController ..> User : menggunakan
-ProdukController ..> Produk : menggunakan
 
-PesananController ..> Pesanan : menggunakan
-' **PesananController ..> DetailPesanan : menggunakan**
-PesananController ..> Produk : menggunakan ' Tetap ada karena perlu cek stok/harga produk saat buat pesanan
+'berita admin
+HapusBeritaContoller ..> Berita : menggunakan
+TambahBeritaController ..> Berita : menggunakan
+UbahBeritaController ..> Berita : menggunakan
+'berita pembeli
+LihatBeritaController ..> Berita : menggunakan
 
-KomplainController ..> Komplain : menggunakan
-KomplainController ..> Pesanan : menggunakan
+'komplain admin
+LihatKomplainController ..> Komplain : menggunakan
+UbahKomplainController ..> Komplain : menggunakan
+'komplain pembeli
+TambahKomplainController ..> Komplain : menggunakan
 
-BeritaController ..> Berita : menggunakan
+'pesanan admin
+LihatSemuaPesananController ..> Pesanan : menggunakan
+UbahPesananController ..> Pesanan : menggunakan
+'pesanan pembeli
+LihatPesananController ..> Pesanan : menggunakan
+TambahPesananController ..> Pesanan : menggunakan
+
+'produk admin
+HapusBeritaContoller ..> Produk : menggunakan
+TambahProdukController ..> Produk : menggunakan
+UbahProdukController ..> Produk : menggunakan
+'produk pembeli
+LihatProdukController ..> Produk : menggunakan
+
+'auth pembeli
+LoginController ..> User : menggunakan
+LogoutController ..> User : menggunakan
+RegisterController ..> User : menggunakan
+
+'pembayaran
+BatalkanPembayaranController ..> Pesanan : menggunakan
+KonfirmasiPembayaranController ..> Pesanan : menggunakan
+LihatDetailPembayaranController ..> Pesanan : menggunakan
 
 @enduml
