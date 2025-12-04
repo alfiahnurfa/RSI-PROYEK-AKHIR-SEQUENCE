@@ -3,42 +3,46 @@ title Sequence Diagram UC-A02: Masuk ke Akun Pengguna
 skinparam style strictuml
 
 actor Pengguna
-boundary HalamanLogin
-control UserController
+boundary login
+boundary dashboard
+control LoginController
 entity User
+database users
 
 activate Pengguna
-Pengguna -> HalamanLogin : Mengakses halaman Login
-activate HalamanLogin
+Pengguna -> login : Mengakses halaman /auth/login
+activate login
 
-HalamanLogin -> Pengguna : Tampilkan formulir login
+login --> Pengguna : Tampilkan halaman login
 
-Pengguna -> HalamanLogin : Input(email, password)
+Pengguna -> login : Input email dan password
 
-Pengguna -> HalamanLogin : Klik "Masuk"
+Pengguna -> login : Klik "Masuk"
 
-HalamanLogin -> UserController : login(request: LoginRequest)
-activate UserController
+login -> LoginController : masuk($request: Request)
+activate LoginController
 
-UserController -> User : validate(request.data)
+LoginController -> LoginController : validate($request)
+
+LoginController -> User : User::where('email': String, $request->email: String )
 activate User
 
-UserController -> User : findByCredentials(email)
+User -> users : SELECT * FROM users WHERE email = $request->email LIMIT 1
+activate users
 
+users --> User : return(user: Users)
+deactivate users
 
-UserController -> User : verifyPassword(password, UserData.hash)
-
-UserController -> User : createToken(UserData.id)
-
-User --> UserController : UserData: User
-
+User --> LoginController : return(user: Users)
 deactivate User
 
-UserController --> HalamanLogin : AuthResponse (token, user)
-deactivate UserController
+LoginController --> login : response($data: Array)
+deactivate LoginController
 
-HalamanLogin -> Pengguna : Redirect ke '/dashboard'
-deactivate HalamanLogin
+login -> dashboard : router.push('/dashboard': String)
+deactivate login
+activate dashboard
+dashboard --> Pengguna : Tampilkan halaman dashboard
 deactivate Pengguna
 
 @enduml

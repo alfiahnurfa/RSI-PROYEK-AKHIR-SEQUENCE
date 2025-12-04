@@ -4,51 +4,73 @@ skinparam style strictuml
 
 actor Pembeli
 boundary HalamanCheckout
-control PesananController
+boundary HalamanDetailTransaksi
+control TambahPesananController
 entity Pesanan
+database pesanans
+entity Produk
+database produks
 entity DetailPesanan
+database detail_pesanans
 entity Pembayaran
+database pembayarans
 
 activate Pembeli
-Pembeli -> HalamanCheckout : Mengakses halaman Checkout
+Pembeli -> HalamanCheckout : Klik "Beli Sekarang"
 activate HalamanCheckout
 
-HalamanCheckout -> PesananController : GET /checkout (auth_id)
-activate PesananController
-PesananController -> DetailPesanan : getCartItems(auth_id)
-activate DetailPesanan
-DetailPesanan --> PesananController : CartData: object
-deactivate DetailPesanan
+HalamanCheckout -> TambahPesananController : buatPesanan($request: Request)
+activate TambahPesananController
 
-PesananController --> HalamanCheckout : displayCheckoutForm(CartData)
-deactivate PesananController
+TambahPesananController -> TambahPesananController : validate($request: Request)
 
-Pembeli -> HalamanCheckout : Konfirmasi Alamat & Pilih Metode Bayar
-Pembeli -> HalamanCheckout : Klik "Beli Sekarang"
-
-HalamanCheckout -> PesananController : POST /pesanan (request: CheckoutRequest)
-activate PesananController
-
-PesananController -> Pesanan : validate(request.data)
+TambahPesananController -> Pesanan : Pesanan::create($data: Array)
 activate Pesanan
 
-PesananController -> Pesanan : createOrder(request.data, auth_id)
-Pesanan -> DetailPesanan : finalizeItems(auth_id)
-activate DetailPesanan
-Pesanan -> DetailPesanan : calculateTotal()
-deactivate DetailPesanan
-Pesanan -> Pembayaran : createPaymentRecord()
-activate Pembayaran
-Pembayaran --> Pesanan : PaymentData: object
-deactivate Pembayaran
-Pesanan --> PesananController : NewOrderID: integer
+Pesanan -> pesanans : INSERT INTO pesanans ...
+activate pesanans
+pesanans --> Pesanan : return(pesanan: Pesanan)
+deactivate pesanans
+Pesanan --> TambahPesananController : return(pesanan: Pesanan)
 deactivate Pesanan
 
-PesananController --> HalamanCheckout : responseSuccess(NewOrderID)
-deactivate PesananController
+loop each $request->items as $item
+    TambahPesananController -> Produk : Produk::find($item.id: Integer)
+    activate Produk
+    Produk -> produks : SELECT * FROM produks WHERE ...
+    activate produks
+    produks --> Produk : return(produk: Produk)
+    deactivate produks
+    Produk --> TambahPesananController : return(produk: Produk)
+    deactivate Produk
+    TambahPesananController -> DetailPesanan : DetailPesanan::create($pesanan.id: Integer, $item: Array)
+    activate DetailPesanan
+    DetailPesanan -> detail_pesanans : INSERT INTO detail_pesanans ...
+    activate detail_pesanans
+    detail_pesanans --> DetailPesanan : return(detail_pesanan: DetailPesanan)
+    deactivate detail_pesanans
+    DetailPesanan --> TambahPesananController : return(detail_pesanan: DetailPesanan)
+    deactivate DetailPesanan
+end
 
-HalamanCheckout -> Pembeli : Redirect ke /dashboard/transaksi/{NewOrderID}
+TambahPesananController -> Pembayaran : Pembayaran::create($data: Array)
+activate Pembayaran
+Pembayaran -> pembayarans : INSERT INTO pembayarans ...
+activate pembayarans
+pembayarans --> Pembayaran : return(pembayaran: Pembayaran)
+deactivate pembayarans
+Pembayaran --> TambahPesananController : return(pembayaran: Pembayaran)
+deactivate Pembayaran
+
+TambahPesananController --> HalamanCheckout : response($data: Array)
+deactivate TambahPesananController
+
+HalamanCheckout -> HalamanDetailTransaksi : navigateTo('/transaksi/{id_pesanan})
 deactivate HalamanCheckout
+activate HalamanDetailTransaksi
+
+HalamanDetailTransaksi -> Pembeli : Tampilkan halaman detail transaksi
+deactivate HalamanDetailTransaksi
 deactivate Pembeli
 
 @enduml

@@ -1,4 +1,5 @@
 @startuml SD-UC-B03_MemfilterProduk
+'MASIH BLM FIX, ASLINYA TIDAK LEWAT BE, HANYA DI FE SAJA
 title Sequence Diagram UC-B03: Memfilter Produk Berdasarkan Kriteria
 skinparam style strictuml
 

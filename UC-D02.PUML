@@ -4,43 +4,51 @@ skinparam style strictuml
 
 actor Pembeli
 boundary HalamanPembayaran
-control PembayaranController
+boundary HalamanTransaksi
+control KonfirmasiPembayaranController
 entity Pembayaran
+database pembayarans
+entity Pesanan
+database pesanans
 
 activate Pembeli
-Pembeli -> HalamanPembayaran : Mengakses /dashboard/pembayaran/{ID_Pesanan}
+Pembeli -> HalamanPembayaran : Klik "Konfirmasi Pembayaran"
 activate HalamanPembayaran
 
-HalamanPembayaran -> PembayaranController : GET /pembayaran/{ID_Pesanan}
-activate PembayaranController
-PembayaranController -> Pembayaran : findDetailById(ID_Pesanan)
-activate Pembayaran
-Pembayaran --> PembayaranController : PaymentData: object (termasuk QR info)
-deactivate Pembayaran
+HalamanPembayaran -> KonfirmasiPembayaranController : perbaruiStatusPembayaran($request: Request)
+activate KonfirmasiPembayaranController
 
-PembayaranController --> HalamanPembayaran : response(PaymentData)
-deactivate PembayaranController
-
-HalamanPembayaran -> Pembeli : Tampilkan QR Code dan tombol "Konfirmasi Pembayaran"
-
-Pembeli -> HalamanPembayaran : Menyelesaikan pembayaran (scan QR)
-Pembeli -> HalamanPembayaran : Klik "Konfirmasi Pembayaran"
-
-HalamanPembayaran -> PembayaranController : PATCH /pembayaran/{ID_Pesanan}/konfirmasi
-activate PembayaranController
-
-PembayaranController -> Pembayaran : validate(request.data)
+KonfirmasiPembayaranController -> Pembayaran : where('id_pesanan', $request->id_pesanan)
 activate Pembayaran
 
-PembayaranController -> Pembayaran : updateStatus(ID_Pesanan, 'menunggu_konfirmasi')
-Pembayaran --> PembayaranController : updateStatus: boolean
+Pembayaran -> pembayarans : SELECT * FROM pembayarans WHERE ...
+activate pembayarans
+pembayarans --> Pembayaran : return(pembayaran: Pembayaran)
+deactivate pembayarans
+
+Pembayaran --> KonfirmasiPembayaranController : return(pembayaran: Pembayaran)
 deactivate Pembayaran
 
-PembayaranController --> HalamanPembayaran : responseSuccess(message: string)
-deactivate PembayaranController
+KonfirmasiPembayaranController -> Pesanan : update($status: String)
+activate Pesanan
 
-HalamanPembayaran -> Pembeli : Tampilkan notifikasi sukses dan status terbaru
+Pesanan -> pesanans : UPDATE pesanans SET ...
+activate pesanans
+pesanans --> Pesanan : return(true: Boolean)
+deactivate pesanans
+
+Pesanan --> KonfirmasiPembayaranController : return(true: Boolean)
+deactivate Pesanan
+
+KonfirmasiPembayaranController --> HalamanPembayaran : response($data: Array)
+deactivate KonfirmasiPembayaranController
+
+HalamanPembayaran -> HalamanTransaksi : navigateTo('/transaksi')
 deactivate HalamanPembayaran
+activate HalamanTransaksi
+
+HalamanTransaksi -> Pembeli : Tampilkan notifikasi sukses
+deactivate HalamanTransaksi
 deactivate Pembeli
 
 @enduml
