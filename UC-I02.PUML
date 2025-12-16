@@ -6,7 +6,6 @@ actor Admin
 boundary HalamanPesananAdmin
 control UbahPesananController
 entity Pesanan
-database pesanans
 
 activate Admin
 
@@ -19,12 +18,6 @@ activate UbahPesananController
 UbahPesananController -> UbahPesananController : validate($request)
 UbahPesananController -> Pesanan : Pesanan::where(id_pesanan).update(status_pesanan: string)
 activate Pesanan
-
-Pesanan -> pesanans : UPDATE pesanans SET ...
-activate pesanans
-
-pesanans --> Pesanan : return(pesanan: Pesanan)
-deactivate pesanans
 
 Pesanan --> UbahPesananController : return(pesanan: Pesanan)
 deactivate Pesanan

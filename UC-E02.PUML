@@ -7,7 +7,6 @@ boundary HalamanTransaksi
 boundary HalamanDetailTransaksi
 control LihatPesananController
 entity Pesanan
-database pesanans
 
 activate Pembeli
 
@@ -18,23 +17,17 @@ HalamanTransaksi -> HalamanDetailTransaksi : navigateTo('/transaksi/{id_pesanan}
 deactivate HalamanTransaksi
 activate HalamanDetailTransaksi
 
-HalamanDetailTransaksi -> PesananController : ambilDetailPesanan($id: int)
-activate PesananController
+HalamanDetailTransaksi -> LihatPesananController : ambilDetailPesanan($id: int)
+activate LihatPesananController
 
-PesananController -> Pesanan : Pesanan::where(id_pembeli, id_pesanan, first())
+LihatPesananController -> Pesanan : Pesanan::where(id_pembeli, id_pesanan, first())
 activate Pesanan
 
-Pesanan -> pesanans : SELECT * FROM pesanans WHERE ...
-activate pesanans
-
-pesanans --> Pesanan : return(pesanan: Pesanan)
-deactivate pesanans
-
-Pesanan --> PesananController : return(pesanan: Pesanan)
+Pesanan --> LihatPesananController : return(pesanan: Pesanan)
 deactivate Pesanan
 
-PesananController --> HalamanDetailTransaksi : response($data: Array)
-deactivate PesananController
+LihatPesananController --> HalamanDetailTransaksi : response($data: Array)
+deactivate LihatPesananController
 
 HalamanDetailTransaksi -> Pembeli : Tampilkan halaman detail pesanan
 deactivate HalamanDetailTransaksi

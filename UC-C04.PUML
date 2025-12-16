@@ -4,34 +4,15 @@ skinparam style strictuml
 
 actor Pembeli
 boundary HalamanKeranjang
-control CartController
-entity ProductModel
-entity DetailPesanan
 
 activate Pembeli
-Pembeli -> HalamanKeranjang : Mengakses '/dashboard/keranjang'
+
+Pembeli -> HalamanKeranjang : Klik tombol + atau - pada kuantitas
 activate HalamanKeranjang
-HalamanKeranjang -> Pembeli : Tampilkan daftar produk dan kuantitas
 
-Pembeli -> HalamanKeranjang : Aksi(ID_Item, New_Quantity)
+HalamanKeranjang -> HalamanKeranjang : changeQty(item)
 
-HalamanKeranjang -> CartController : PATCH /cart/{item_id} (request: object)
-activate CartController
-
-CartController -> ProductModel : checkStock(ID_Item, New_Quantity)
-activate ProductModel
-ProductModel --> CartController : StockStatus: boolean
-deactivate ProductModel
-
-CartController -> DetailPesanan : updateQuantity(ID_Item, New_Quantity)
-activate DetailPesanan
-DetailPesanan --> CartController : UpdatedDetail: object
-deactivate DetailPesanan
-
-CartController --> HalamanKeranjang : response(UpdatedCartData)
-deactivate CartController
-
-HalamanKeranjang -> Pembeli : Melihat kuantitas dan subtotal yang diperbarui
+HalamanKeranjang -> Pembeli : Tampilkan perubahan kuantitas
 deactivate HalamanKeranjang
 deactivate Pembeli
 

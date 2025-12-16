@@ -7,7 +7,6 @@ boundary HalamanUbahProduk
 boundary HalamanKelolaProduk
 control UbahProdukController
 entity Produk
-database produks
 
 activate Admin
 
@@ -19,12 +18,6 @@ activate UbahProdukController
 
 UbahProdukController -> Produk : Produk::where(id_produk).update(stok: integer)
 activate Produk
-
-Produk -> produks : UPDATE produks SET stok = ... WHERE id_produk = ...
-activate produks
-
-produks --> Produk : return(produk: Produk)
-deactivate produks
 
 Produk --> UbahProdukController : return(produk: Produk)
 deactivate Produk

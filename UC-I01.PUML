@@ -6,7 +6,6 @@ actor Admin
 boundary HalamanDaftarPesanan
 control LihatSemuaPesananController
 entity Pesanan
-database pesanans
 
 activate Admin
 
@@ -18,12 +17,6 @@ activate LihatSemuaPesananController
 
 LihatSemuaPesananController -> Pesanan : Pesanan::all()
 activate Pesanan
-
-Pesanan -> pesanans : SELECT * FROM pesanans
-activate pesanans
-
-pesanans --> Pesanan : return(pesanan: Array)
-deactivate pesanans
 
 Pesanan --> LihatSemuaPesananController : return(pesanan: Array)
 deactivate Pesanan

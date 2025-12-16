@@ -7,13 +7,9 @@ boundary HalamanCheckout
 boundary HalamanDetailTransaksi
 control TambahPesananController
 entity Pesanan
-database pesanans
 entity Produk
-database produks
 entity DetailPesanan
-database detail_pesanans
 entity Pembayaran
-database pembayarans
 
 activate Pembeli
 Pembeli -> HalamanCheckout : Klik "Beli Sekarang"
@@ -27,38 +23,26 @@ TambahPesananController -> TambahPesananController : validate($request: Request)
 TambahPesananController -> Pesanan : Pesanan::create($data: Array)
 activate Pesanan
 
-Pesanan -> pesanans : INSERT INTO pesanans ...
-activate pesanans
-pesanans --> Pesanan : return(pesanan: Pesanan)
-deactivate pesanans
 Pesanan --> TambahPesananController : return(pesanan: Pesanan)
 deactivate Pesanan
 
 loop each $request->items as $item
     TambahPesananController -> Produk : Produk::find($item.id: Integer)
     activate Produk
-    Produk -> produks : SELECT * FROM produks WHERE ...
-    activate produks
-    produks --> Produk : return(produk: Produk)
-    deactivate produks
+
     Produk --> TambahPesananController : return(produk: Produk)
     deactivate Produk
+
     TambahPesananController -> DetailPesanan : DetailPesanan::create($pesanan.id: Integer, $item: Array)
     activate DetailPesanan
-    DetailPesanan -> detail_pesanans : INSERT INTO detail_pesanans ...
-    activate detail_pesanans
-    detail_pesanans --> DetailPesanan : return(detail_pesanan: DetailPesanan)
-    deactivate detail_pesanans
+
     DetailPesanan --> TambahPesananController : return(detail_pesanan: DetailPesanan)
     deactivate DetailPesanan
 end
 
 TambahPesananController -> Pembayaran : Pembayaran::create($data: Array)
 activate Pembayaran
-Pembayaran -> pembayarans : INSERT INTO pembayarans ...
-activate pembayarans
-pembayarans --> Pembayaran : return(pembayaran: Pembayaran)
-deactivate pembayarans
+
 Pembayaran --> TambahPesananController : return(pembayaran: Pembayaran)
 deactivate Pembayaran
 

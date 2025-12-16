@@ -7,7 +7,6 @@ boundary HalamanDaftarBerita
 boundary HalamanDetailBerita
 control LihatBeritaController
 entity Berita
-database beritas
 
 activate Pembeli
 
@@ -19,12 +18,6 @@ activate LihatBeritaController
 
 LihatBeritaController -> Berita : Berita::where(status='published')
 activate Berita
-
-Berita -> beritas : SELECT * FROM beritas WHERE ...
-activate beritas
-
-beritas --> Berita : return(berita: Array)
-deactivate beritas
 
 Berita --> LihatBeritaController : return(berita: Array)
 deactivate Berita
@@ -46,12 +39,6 @@ activate LihatBeritaController
 LihatBeritaController -> Berita : Berita::where($id_berita, first())
 activate Berita
 
-Berita -> beritas : SELECT * FROM beritas WHERE ...
-activate beritas
-
-beritas --> Berita : return(berita: Berita)
-deactivate beritas
-
 Berita --> LihatBeritaController : return(berita: Berita)
 deactivate Berita
 
@@ -60,40 +47,5 @@ deactivate LihatBeritaController
 
 HalamanDetailBerita -> Pembeli : Tampilkan detail berita
 deactivate HalamanDetailBerita
-
-' activate Pembeli
-' Pembeli -> HalamanDaftarBerita : Mengakses halaman berita
-' activate HalamanDaftarBerita
-
-' HalamanDaftarBerita -> BeritaController : GET /berita
-' activate BeritaController
-
-' BeritaController -> Berita : findPublished()
-' activate Berita
-' Berita --> BeritaController : List Ringkasan Berita: List<Berita>
-' deactivate Berita
-
-' BeritaController --> HalamanDaftarBerita : response(List Ringkasan Berita)
-' deactivate BeritaController
-
-' HalamanDaftarBerita -> Pembeli : Tampilkan daftar ringkasan berita
-
-' Pembeli -> HalamanDaftarBerita : Memilih berita (ID_Berita: integer)
-' HalamanDaftarBerita -> BeritaController : GET /berita/{ID_Berita}
-' deactivate HalamanDaftarBerita
-' activate BeritaController
-
-' BeritaController -> Berita : findById(ID_Berita)
-' activate Berita
-' Berita --> BeritaController : Data Detail Berita: Berita
-' deactivate Berita
-
-' BeritaController --> HalamanDetailBerita : response(Data Detail Berita)
-' deactivate BeritaController
-' activate HalamanDetailBerita
-
-' HalamanDetailBerita -> Pembeli : Tampilkan seluruh konten berita
-' deactivate HalamanDetailBerita
-' deactivate Pembeli
 
 @enduml

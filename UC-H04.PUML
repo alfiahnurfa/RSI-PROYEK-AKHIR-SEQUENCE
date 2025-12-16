@@ -6,7 +6,6 @@ actor Admin
 boundary HalamanKelolaProduk
 control UbahProdukController
 entity Produk
-database produks
 
 activate Admin
 
@@ -18,12 +17,6 @@ activate UbahProdukController
 
 UbahProdukController -> Produk : Produk::where(id_produk).update(status_produk: 'Arsip')
 activate Produk
-
-Produk -> produks : UPDATE produks SET status_produk = 'Arsip' WHERE id_produk = ...
-activate produks
-
-produks --> Produk : return(true: boolean)
-deactivate produks
 
 Produk --> UbahProdukController : return(true: boolean)
 deactivate Produk

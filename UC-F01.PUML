@@ -7,31 +7,24 @@ boundary HalamanAduan
 boundary HalamanTransaksi
 control TambahKomplainController
 entity Komplain
-database komplains
 
 activate Pembeli
 Pembeli -> HalamanAduan : Klik "Kirim Aduan"
 activate HalamanAduan
 
-HalamanAduan -> KomplainController : kirimAduan($request: Request)
-activate KomplainController
+HalamanAduan -> TambahKomplainController : kirimAduan($request: Request)
+activate TambahKomplainController
 
-KomplainController -> KomplainController : validate($request)
+TambahKomplainController -> TambahKomplainController : validate($request)
 
-KomplainController -> Komplain : create($data: Array)
+TambahKomplainController -> Komplain : create($data: Array)
 activate Komplain
 
-Komplain -> komplains : INSERT INTO komplains ...
-activate komplains
-
-komplains --> Komplain : return(komplain: Komplain)
-deactivate komplains
-
-Komplain --> KomplainController : return(komplain: Komplain)
+Komplain --> TambahKomplainController : return(komplain: Komplain)
 deactivate Komplain
 
-KomplainController --> HalamanAduan : response(data: Array)
-deactivate KomplainController
+TambahKomplainController --> HalamanAduan : response(data: Array)
+deactivate TambahKomplainController
 
 HalamanAduan --> Pembeli : Tampilkan notifikasi sukses
 HalamanAduan -> HalamanTransaksi : navigateTio('/transaksi')

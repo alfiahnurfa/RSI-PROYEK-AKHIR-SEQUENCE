@@ -6,7 +6,6 @@ actor Admin
 boundary HalamanKelolaProduk
 control HapusProdukController
 entity Produk
-database produks
 
 activate Admin
 
@@ -18,12 +17,6 @@ activate HapusProdukController
 
 HapusProdukController -> Produk : Produk::deleteById(id_produk: integer)
 activate Produk
-
-Produk -> produks : DELETE FROM produks WHERE id_produk = ...
-activate produks
-
-produks --> Produk : return(true: boolean)
-deactivate produks
 
 Produk --> HapusProdukController : return(true: boolean)
 deactivate Produk

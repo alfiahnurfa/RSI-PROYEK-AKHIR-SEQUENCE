@@ -6,7 +6,6 @@ actor Admin
 boundary HalamanKelolaBerita
 control HapusBeritaController
 entity Berita
-database beritas
 
 activate Admin
 
@@ -18,12 +17,6 @@ activate HapusBeritaController
 
 HapusBeritaController -> Berita : Berita::deleteById(id_berita: int)
 activate Berita
-
-Berita -> beritas : DELETE FROM beritas WHERE id_berita = ...
-activate beritas
-
-beritas --> Berita : return(true: boolean)
-deactivate beritas
 
 Berita --> HapusBeritaController : return(true: boolean)
 deactivate Berita

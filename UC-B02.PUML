@@ -5,31 +5,13 @@ skinparam style strictuml
 
 actor Pembeli
 boundary HalamanKatalog
-control LihatProdukController
-entity Produk
-database produks
 
 activate Pembeli
+
 Pembeli -> HalamanKatalog : Input keyword pencarian & Enter
 activate HalamanKatalog
 
-HalamanKatalog -> LihatProdukController : cariProduk($request: Request)
-activate LihatProdukController
-
-LihatProdukController -> Produk : Produk::query()->where('status_produk', 'Aktif')
-activate Produk
-
-LihatProdukController -> Produk : $query->where(...) // Filter by Name/Desc/Category
-Produk -> produks : SELECT * FROM produks WHERE ... LIMIT 10 OFFSET 0
-activate produks
-produks --> Produk : return(Result: Paginator)
-deactivate produks
-
-Produk --> LihatProdukController : return(produks: LengthAwarePaginator)
-deactivate Produk
-
-LihatProdukController --> HalamanKatalog : response()->json($produks, 200)
-deactivate LihatProdukController
+HalamanKatalog -> HalamanKatalog : items = items.filter(query: String)
 
 HalamanKatalog -> Pembeli : Tampilkan hasil pencarian
 deactivate HalamanKatalog

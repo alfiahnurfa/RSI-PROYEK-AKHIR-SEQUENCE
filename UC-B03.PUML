@@ -5,25 +5,12 @@ skinparam style strictuml
 
 actor Pembeli
 boundary HalamanKatalog
-control ProdukController
-entity Produk
 
 activate Pembeli
 Pembeli -> HalamanKatalog : Akses halaman katalog
 activate HalamanKatalog
 
-Pembeli -> HalamanKatalog : Pilih filter (kategori/harga/sort)
-
-HalamanKatalog -> ProdukController : filter(filterCriteria: FilterCriteria)
-activate ProdukController
-
-ProdukController -> Produk : filterByCriteria(filterCriteria.data)
-activate Produk
-Produk --> ProdukController : FilteredProductList: List<Produk>
-deactivate Produk
-
-ProdukController --> HalamanKatalog : FilteredProductList
-deactivate ProdukController
+HalamanKatalog -> HalamanKatalog : items = items.filter(category: String)
 
 HalamanKatalog -> Pembeli : Tampilkan produk yang tersaring
 deactivate HalamanKatalog

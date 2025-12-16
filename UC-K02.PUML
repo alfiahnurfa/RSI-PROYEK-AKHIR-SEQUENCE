@@ -7,7 +7,6 @@ boundary HalamanKelolaBerita
 boundary HalamanTambahBerita
 control TambahBeritaController
 entity Berita
-database beritas
 
 activate Admin
 
@@ -20,12 +19,6 @@ activate TambahBeritaController
 TambahBeritaController -> TambahBeritaController : validate($request: Request)
 TambahBeritaController -> Berita : Berita::create(data: Array)
 activate Berita
-
-Berita -> beritas : INSERT INTO beritas ...
-activate beritas
-
-beritas --> Berita : return(berita: Berita)
-deactivate beritas
 
 Berita --> TambahBeritaController : return(berita: Berita)
 deactivate Berita

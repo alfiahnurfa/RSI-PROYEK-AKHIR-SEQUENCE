@@ -4,36 +4,19 @@ skinparam style strictuml
 
 actor Pembeli
 boundary HalamanDetailProduk
-control CartController
-entity ProductModel
-entity DetailPesanan
+boundary HalamanKeranjang
 
 activate Pembeli
-Pembeli -> HalamanDetailProduk : Mengakses Detail Produk
-activate HalamanDetailProduk
-
-Pembeli -> HalamanDetailProduk : Input(quantity: integer)
 
 Pembeli -> HalamanDetailProduk : Klik "Tambah ke Keranjang"
+activate HalamanDetailProduk
 
-HalamanDetailProduk -> CartController : POST /cart/add (request: object)
-activate CartController
-
-CartController -> ProductModel : checkStockAndPrice(request.product_id, request.quantity)
-activate ProductModel
-ProductModel --> CartController : {price: number, stock_ok: boolean}
-deactivate ProductModel
-
-CartController -> DetailPesanan : upsertItem(user.id, product_id, quantity, price)
-activate DetailPesanan
-DetailPesanan --> CartController : StatusPersistence: boolean
-deactivate DetailPesanan
-
-CartController --> HalamanDetailProduk : responseSuccess(message: string)
-deactivate CartController
-
-HalamanDetailProduk -> Pembeli : Tampilkan notifikasi sukses
+HalamanDetailProduk -> HalamanDetailProduk : addToCart(produkID: integer, jumlah: integer)
+HalamanDetailProduk -> HalamanKeranjang : navigateTo('/keranjang')
 deactivate HalamanDetailProduk
+activate HalamanKeranjang
+
+HalamanKeranjang -> Pembeli : Tampilkan halaman keranjang
 deactivate Pembeli
 
 @enduml

@@ -7,9 +7,7 @@ boundary HalamanPembayaran
 boundary HalamanTransaksi
 control KonfirmasiPembayaranController
 entity Pembayaran
-database pembayarans
 entity Pesanan
-database pesanans
 
 activate Pembeli
 Pembeli -> HalamanPembayaran : Klik "Konfirmasi Pembayaran"
@@ -21,21 +19,11 @@ activate KonfirmasiPembayaranController
 KonfirmasiPembayaranController -> Pembayaran : where('id_pesanan', $request->id_pesanan)
 activate Pembayaran
 
-Pembayaran -> pembayarans : SELECT * FROM pembayarans WHERE ...
-activate pembayarans
-pembayarans --> Pembayaran : return(pembayaran: Pembayaran)
-deactivate pembayarans
-
 Pembayaran --> KonfirmasiPembayaranController : return(pembayaran: Pembayaran)
 deactivate Pembayaran
 
 KonfirmasiPembayaranController -> Pesanan : update($status: String)
 activate Pesanan
-
-Pesanan -> pesanans : UPDATE pesanans SET ...
-activate pesanans
-pesanans --> Pesanan : return(true: Boolean)
-deactivate pesanans
 
 Pesanan --> KonfirmasiPembayaranController : return(true: Boolean)
 deactivate Pesanan

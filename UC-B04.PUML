@@ -7,7 +7,6 @@ boundary HalamanKatalog
 boundary HalamanDetailProduk
 control LihatProdukController
 entity Produk
-database produks
 
 activate Pembeli
 Pembeli -> HalamanKatalog : Klik Card Produk
@@ -22,12 +21,6 @@ activate LihatProdukController
 
 LihatProdukController -> Produk : Produk::where(id, status_aktif)->first()
 activate Produk
-
-Produk -> produks : SELECT * FROM produks WHERE ...
-activate produks
-
-produks --> Produk : return(produk: Produk)
-deactivate produks
 
 Produk --> LihatProdukController : return(produk: Produk)
 deactivate Produk

@@ -6,7 +6,6 @@ actor Pengguna
 boundary HalamanProfil
 control UbahProfilController
 entity User
-database users
 
 activate Pengguna
 Pengguna -> HalamanProfil : Klik "Simpan Profil"
@@ -18,12 +17,6 @@ activate UbahProfilController
 UbahProfilController -> UbahProfilController : validate($request: Request)
 UbahProfilController -> User : $user->update($data: Array)
 activate User
-
-User -> users : UPDATE users SET ... WHERE id = $user->id
-activate users
-
-users --> User : return(true: Boolean)
-deactivate users
 
 User --> UbahProfilController : return(true: Boolean)
 deactivate User

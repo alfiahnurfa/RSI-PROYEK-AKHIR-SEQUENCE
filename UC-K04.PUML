@@ -7,7 +7,6 @@ boundary HalamanDaftarBerita
 boundary HalamanUbahBerita
 control UbahBeritaController
 entity Berita
-database beritas
 
 activate Admin
 
@@ -20,12 +19,6 @@ activate UbahBeritaController
 UbahBeritaController -> UbahBeritaController : validate(request: Request)
 UbahBeritaController -> Berita : Berita::where(id_berita).update(data: Array)
 activate Berita
-
-Berita -> beritas : UPDATE beritas SET ...
-activate beritas
-
-beritas --> Berita : return(berita: Berita)
-deactivate beritas
 
 Berita --> UbahBeritaController : return(berita: Berita)
 deactivate Berita
