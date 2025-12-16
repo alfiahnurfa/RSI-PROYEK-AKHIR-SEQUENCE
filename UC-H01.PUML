@@ -6,7 +6,6 @@ actor Admin
 boundary HalamanKelolaProduk
 control LihatProdukController
 entity Produk
-database produks
 
 activate Admin
 
@@ -18,12 +17,6 @@ activate LihatProdukController
 
 LihatProdukController -> Produk : Produk::all()
 activate Produk
-
-Produk -> produks : SELECT * FROM produks
-activate produks
-
-produks --> Produk : return(produk: Array)
-deactivate produks
 
 Produk --> LihatProdukController : return(produk: Array)
 deactivate Produk

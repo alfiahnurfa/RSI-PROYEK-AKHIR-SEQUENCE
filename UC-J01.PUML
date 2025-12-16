@@ -7,7 +7,6 @@ boundary HalamanDaftarPengaduan
 boundary HalamanDetailKomplain
 control LihatKomplainController
 entity Komplain
-database komplains
 
 activate Admin
 
@@ -19,12 +18,6 @@ activate LihatKomplainController
 
 LihatKomplainController -> Komplain : Komplain::all()
 activate Komplain
-
-Komplain -> komplains : SELECT * FROM komplains
-activate komplains
-
-komplains --> Komplain : return(komplains: Array)
-deactivate komplains
 
 Komplain --> LihatKomplainController : return(komplains: Array)
 deactivate Komplain
@@ -44,12 +37,6 @@ activate LihatKomplainController
 
 LihatKomplainController -> Komplain : Komplain::where(id_komplain, first())
 activate Komplain
-
-Komplain -> komplains : SELECT * FROM komplains WHERE ...
-activate komplains
-
-komplains --> Komplain : return(komplain: Komplain)
-deactivate komplains
 
 Komplain --> LihatKomplainController : return(komplain: Komplain)
 deactivate Komplain

@@ -6,7 +6,6 @@ actor Pembeli
 boundary HalamanTransaksi
 control LihatPesananController
 entity Pesanan
-database pesanans
 
 activate Pembeli
 
@@ -18,12 +17,6 @@ activate LihatPesananController
 
 LihatPesananController -> Pesanan : Pesanan::where('user_id', auth_id)
 activate Pesanan
-
-Pesanan -> pesanans : SELECT * FROM pesanans WHERE ...
-activate pesanans
-
-pesanans --> Pesanan : return(pesanan: Array)
-deactivate pesanans
 
 Pesanan --> LihatPesananController : return(pesanan: Array)
 deactivate Pesanan

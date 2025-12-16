@@ -6,7 +6,6 @@ actor Admin
 boundary HalamanTambahProduk
 control TambahProdukController
 entity Produk
-database produks
 
 activate Admin
 
@@ -24,12 +23,6 @@ TambahProdukController -> TambahProdukController : validate($request)
 
 TambahProdukController -> Produk : Produk::create($data: Array)
 activate Produk
-
-Produk -> produks : INSERT INTO produks ...
-activate produks
-
-produks --> Produk : return(produk: Produk)
-deactivate produks
 
 Produk --> TambahProdukController : return(produk: Produk)
 deactivate Produk

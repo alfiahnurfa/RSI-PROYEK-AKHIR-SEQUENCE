@@ -6,8 +6,6 @@ actor Admin
 boundary HalamanKelolaBerita
 control LihatSemuaBeritaController
 entity Berita
-database beritas
-
 
 Admin -> HalamanKelolaBerita : Mengakses '/admin/berita'
 activate HalamanKelolaBerita
@@ -17,12 +15,6 @@ activate LihatSemuaBeritaController
 
 LihatSemuaBeritaController -> Berita : Berita::all()
 activate Berita
-
-Berita -> beritas : SELECT * FROM beritas
-activate beritas
-
-beritas --> Berita : return(berita: Array)
-deactivate beritas
 
 Berita --> LihatSemuaBeritaController : return(berita: Array)
 deactivate Berita

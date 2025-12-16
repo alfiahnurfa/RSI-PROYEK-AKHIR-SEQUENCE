@@ -7,7 +7,6 @@ boundary register
 boundary login
 control RegisterController
 entity User
-database users
 
 activate Pengguna
 Pengguna -> register : Mengakses halaman /auth/register
@@ -26,12 +25,6 @@ RegisterController -> RegisterController : validate($request: Request)
 
 RegisterController -> User : User::create($request: Request)
 activate User
-
-User -> users : INSERT INTO users VALUES (data)
-activate users
-
-users --> User : return(user: Users)
-deactivate users
 
 User --> RegisterController : return(user: Users)
 deactivate User

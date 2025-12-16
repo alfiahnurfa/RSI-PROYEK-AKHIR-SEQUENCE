@@ -5,33 +5,19 @@ skinparam style strictuml
 actor Pembeli
 boundary HalamanDashboard
 boundary HalamanKeranjang
-control CartController
-entity DetailPesanan
 
 activate Pembeli
-Pembeli -> HalamanDashboard : Mengakses dashboard
+
+Pembeli -> HalamanDashboard : Klik logo keranjang
 activate HalamanDashboard
 
-Pembeli -> HalamanDashboard : Klik "Keranjang"
+HalamanDashboard -> HalamanKeranjang : navigateTo('/keranjang')
+activate HalamanKeranjang
 deactivate HalamanDashboard
 
-HalamanKeranjang -> CartController : GET /cart
-activate CartController
+HalamanKeranjang -> HalamanKeranjang : cartItems.value = cart.value.items
 
-CartController -> DetailPesanan : findActiveCartByUserId(auth_id: integer)
-activate DetailPesanan
-
-CartController -> DetailPesanan : calculateSubtotal(CartItems)
-
-DetailPesanan --> CartController : CartItems: List<Item>
-deactivate DetailPesanan
-
-
-CartController --> HalamanKeranjang : response(CartItems, Subtotal)
-deactivate CartController
-activate HalamanKeranjang
-
-HalamanKeranjang -> Pembeli : Tampilkan daftar keranjang produk
+HalamanKeranjang -> Pembeli : Menampilkan daftar keranjang
 deactivate HalamanKeranjang
 deactivate Pembeli
 

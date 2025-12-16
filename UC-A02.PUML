@@ -7,7 +7,6 @@ boundary login
 boundary dashboard
 control LoginController
 entity User
-database users
 
 activate Pengguna
 Pengguna -> login : Mengakses halaman /auth/login
@@ -26,12 +25,6 @@ LoginController -> LoginController : validate($request)
 
 LoginController -> User : User::where('email': String, $request->email: String )
 activate User
-
-User -> users : SELECT * FROM users WHERE email = $request->email LIMIT 1
-activate users
-
-users --> User : return(user: Users)
-deactivate users
 
 User --> LoginController : return(user: Users)
 deactivate User

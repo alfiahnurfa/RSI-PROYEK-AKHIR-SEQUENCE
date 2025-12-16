@@ -6,7 +6,6 @@ actor Pembeli
 boundary HalamanKatalog
 control LihatProdukController
 entity Produk
-database produks
 
 activate Pembeli
 Pembeli -> HalamanKatalog : Mengakses halaman '/produk'
@@ -17,11 +16,6 @@ activate LihatProdukController
 
 LihatProdukController -> Produk : Produk::where('status_produk', 'Aktif')
 activate Produk
-
-Produk -> produks : SELECT * FROM produks WHERE status_produk = 'Aktif'
-activate produks
-produks --> Produk : return(produk: Array)
-deactivate produks
 
 Produk --> LihatProdukController : return(produk: Array)
 deactivate Produk

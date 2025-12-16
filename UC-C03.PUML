@@ -4,28 +4,14 @@ skinparam style strictuml
 
 actor Pembeli
 boundary HalamanKeranjang
-control CartController
-entity DetailPesanan
 
 activate Pembeli
-Pembeli -> HalamanKeranjang : Mengakses '/dashboard/keranjang'
+
+Pembeli -> HalamanKeranjang : Klik logo hapus
 activate HalamanKeranjang
-HalamanKeranjang -> Pembeli : Tampilkan daftar produk di keranjang
 
-Pembeli -> HalamanKeranjang : Klik "Hapus" (item_id: string)
-
-HalamanKeranjang -> CartController : DELETE /cart/{item_id}
-activate CartController
-
-CartController -> DetailPesanan : delete(item_id: string)
-activate DetailPesanan
-DetailPesanan --> CartController : deleteStatus: boolean
-deactivate DetailPesanan
-
-CartController --> HalamanKeranjang : responseSuccess(message: string)
-deactivate CartController
-
-HalamanKeranjang -> Pembeli : Tampilkan notifikasi dan daftar keranjang terbaru
+HalamanKeranjang -> HalamanKeranjang : removeItem(id_detail: String)
+HalamanKeranjang -> Pembeli : Tampilkan keranjang terbaru
 deactivate HalamanKeranjang
 deactivate Pembeli
 
